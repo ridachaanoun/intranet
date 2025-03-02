@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: intranet
+    restart: always
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - laravel
+
+  db:
+    image: postgres:latest
+    container_name: intranet_db
+    restart: always
+    environment:
+      POSTGRES_DB: intranet 
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - laravel
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pg_intranet
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: intranet@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: intranet
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - laravel
+
+networks:
+  laravel:
+
+volumes:
+  pgdata:
