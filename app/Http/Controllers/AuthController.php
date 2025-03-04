@@ -8,35 +8,42 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\HasApiTokens;
-
+use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class AuthController extends Controller
 {
+    use AuthorizesRequests ;
     public function register(Request $request)
     {
         try {
+            $this->authorize('create', User::class);
+    
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
                 'role' => 'required|in:admin,teacher,student',
             ]);
-
+    
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-
+    
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
             ]);
-
-            return response()->json(['message' => 'User registered successfully',"user"=>$user], 201);
+    
+            return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
+    
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Registration failed'], 500);
         }
     }
+    
 
     public function login(Request $request)
     {
