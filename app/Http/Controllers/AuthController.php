@@ -34,6 +34,13 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
             ]);
+
+            if ($user->role === 'student') {
+                // Create related empty records
+                $user->personalInfo()->create([]);
+                $user->accountInfo()->create([]);
+                $user->profiles()->create([]);
+            }
     
             return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
     

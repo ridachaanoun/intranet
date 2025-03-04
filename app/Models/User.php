@@ -45,7 +45,7 @@ public function accountInfo()
 
 public function profiles()
 {
-    return $this->hasOne(Profiles::class);
+    return $this->hasOne(Profile::class);
 }
 
     /**
