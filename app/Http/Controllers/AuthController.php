@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Promotion;
 use App\Models\User;
+use Auth;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -46,7 +49,7 @@ class AuthController extends Controller
     
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return response()->json(['error' => 'Unauthorized'], 403);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Registration failed'], 500);
         }
     }
@@ -80,8 +83,13 @@ class AuthController extends Controller
 
             $token = $user->createToken('authToken')->accessToken;
 
-            return response()->json(['token' => $token, 'user' => $user]);
-        } catch (\Exception $e) {
+            $responseData = [
+                'token' => $token,
+                'user' => $user
+            ];
+    
+            return response()->json($responseData);
+        } catch (Exception $e) {
             return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
@@ -91,8 +99,27 @@ class AuthController extends Controller
         try {
             $request->user()->tokens()->delete();
             return response()->json(['message' => 'Logged out successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Logout failed'], 500);
+        }
+    }
+
+    public function User(Request $request){
+        try {
+            $user = Auth()->user();
+            $responseData = [
+                'user' => $user
+            ];
+
+            if ($user->role === 'student') {
+                $responseData['user']['personal_info'] = $user->personalInfo;
+                $responseData['user']['account_info'] = $user->accountInfo->promotion;
+                $responseData['user']['profiles'] = $user->profiles;
+            }
+
+            return response()->json($responseData,200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Something went wrong',"e"=>$e->getMessage()], 500);
         }
     }
 }
