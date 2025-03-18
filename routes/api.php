@@ -15,6 +15,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get("/user",[AuthController::class,"user"]);
     Route::put('/user/{user}/personal-info', [UserDetailsController::class, 'updatePersonalInfo']);
     Route::put('/user/{user}/account-info', [UserDetailsController::class, 'updateAccountInfo']);
-
+    Route::put('/user/{user}/profile', [UserDetailsController::class, 'updateProfile']);
 
 });

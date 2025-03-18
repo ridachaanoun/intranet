@@ -40,6 +40,8 @@ class UserDetailsController extends Controller
 
     public function updateAccountInfo(Request $request, User $user)
     {
+        $this->authorize('create', User::class);
+
         $validatedData = $request->validate([
             'campus'             => 'nullable|string|max:255',
             'registration_date'  => 'nullable|date',
@@ -51,12 +53,35 @@ class UserDetailsController extends Controller
         ]);
 
         $user->accountInfo()->update($validatedData);
-        $updatedPersonalInfo = $user->accountInfo()->first();
+        $updatedaccountInfo = $user->accountInfo()->first();
 
         return response()->json([
             'message'      => 'Account info updated successfully',
-            'account_info' => $updatedPersonalInfo
+            'account_info' => $updatedaccountInfo
         ]);
     }
 
+
+    public function updateProfile(Request $request, User $user)
+    {
+        $this->authorize('update', $user);
+        $validatedData = $request->validate([
+            'linkedin'   => 'nullable|url',
+            'github'     => 'nullable|url',
+            'website'    => 'nullable|url',
+            'codingame'  => 'nullable|url',
+            'hackerrank' => 'nullable|url',
+            'codeforces' => 'nullable|url',
+            'twitter'    => 'nullable|url',
+            'instagram'  => 'nullable|url',
+            'facebook'   => 'nullable|url',
+        ]);
+
+        $user->profiles()->update($validatedData);
+        $updatedProfile = $user->profiles()->first();
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'profile' => $updatedProfile
+        ]);
+    }
 }
