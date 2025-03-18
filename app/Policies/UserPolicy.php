@@ -36,7 +36,8 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return false;
+                // Allow the user to update their own profile
+                return $user->id === $model->id;
     }
 
     /**
