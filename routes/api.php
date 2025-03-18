@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserDetailsController;
+use App\Http\Controllers\AdminController;
 
 
 
@@ -16,5 +17,5 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/user/{user}/personal-info', [UserDetailsController::class, 'updatePersonalInfo']);
     Route::put('/user/{user}/account-info', [UserDetailsController::class, 'updateAccountInfo']);
     Route::put('/user/{user}/profile', [UserDetailsController::class, 'updateProfile']);
-
+    Route::put('/admin/user/{user}/role', [AdminController::class, 'updateUserRole']);
 });
