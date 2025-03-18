@@ -38,5 +38,25 @@ class UserDetailsController extends Controller
         ]);
     }
 
- 
+    public function updateAccountInfo(Request $request, User $user)
+    {
+        $validatedData = $request->validate([
+            'campus'             => 'nullable|string|max:255',
+            'registration_date'  => 'nullable|date',
+            'promotion_id'     => 'nullable|string|max:255',
+            'email_login'        => 'nullable|string|email|max:255',
+            'username'           => 'nullable|string|max:255',
+            'password'           => 'nullable|string|min:6',
+            'discord_username'   => 'nullable|string|max:255',
+        ]);
+
+        $user->accountInfo()->update($validatedData);
+        $updatedPersonalInfo = $user->accountInfo()->first();
+
+        return response()->json([
+            'message'      => 'Account info updated successfully',
+            'account_info' => $updatedPersonalInfo
+        ]);
+    }
+
 }

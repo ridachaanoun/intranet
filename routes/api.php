@@ -14,5 +14,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get("/user",[AuthController::class,"user"]);
     Route::put('/user/{user}/personal-info', [UserDetailsController::class, 'updatePersonalInfo']);
+    Route::put('/user/{user}/account-info', [UserDetailsController::class, 'updateAccountInfo']);
+
 
 });
