@@ -47,7 +47,10 @@ public function profiles()
 {
     return $this->hasOne(Profile::class);
 }
-
+public function classes()
+{
+    return $this->belongsToMany(Classroom::class, 'class_student', 'student_id', 'class_id');
+}
     /**
      * Get the attributes that should be cast.
      *
