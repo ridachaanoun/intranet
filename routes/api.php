@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClassroomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -18,4 +19,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/user/{user}/account-info', [UserDetailsController::class, 'updateAccountInfo']);
     Route::put('/user/{user}/profile', [UserDetailsController::class, 'updateProfile']);
     Route::put('/admin/user/{user}/role', [AdminController::class, 'updateUserRole']);
+    Route::post('/admin/user/{user}/upload-image', [AdminController::class, 'uploadImage']);
+
 });
