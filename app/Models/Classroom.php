@@ -9,7 +9,9 @@ class Classroom extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'promotion_id', 'teacher_id'];
+    protected $fillable = [
+        'slug', 'name', 'level', 'level_value', 'campus', 'campus_value', 'learners', 'promotion_id', 'cover_image', 'teacher_id', 'delegate_id'
+    ];
 
     // Define the relationship with the Promotion model
     public function promotion()
@@ -23,9 +25,16 @@ class Classroom extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    // Define the many-to-many relationship with the User model for students
+    // Define the relationship with the User model for the delegate
+    public function delegate()
+    {
+        return $this->belongsTo(User::class, 'delegate_id');
+    }
+
+    // Define the relationship with the User model for students
     public function students()
     {
-        return $this->belongsToMany(User::class, 'classroom_student', 'classroom_id', 'student_id')->where('role', 'student');
+        return $this->belongsToMany(User::class, 'classroom_student', 'classroom_id', 'student_id')
+                    ->where('role', 'student');
     }
 }

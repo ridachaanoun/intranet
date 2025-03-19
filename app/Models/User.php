@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'image',
     ];
 
     /**
@@ -33,24 +34,37 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function personalInfo()
-{
-    return $this->hasOne(PersonalInfo::class);
-}
+        public function personalInfo()
+    {
+        return $this->hasOne(PersonalInfo::class);
+    }
 
-public function accountInfo()
-{
-    return $this->hasOne(AccountInfo::class);
-}
+    public function accountInfo()
+    {
+        return $this->hasOne(AccountInfo::class);
+    }
 
-public function profiles()
-{
-    return $this->hasOne(Profile::class);
-}
-public function classes()
-{
-    return $this->belongsToMany(Classroom::class, 'class_student', 'student_id', 'class_id');
-}
+    public function profiles()
+    {
+        return $this->hasOne(Profile::class);
+    }
+    // Define the inverse relationship with the Classroom model as a teacher
+    public function classroomsAsTeacher()
+    {
+        return $this->hasMany(Classroom::class, 'teacher_id');
+    }
+
+    // Define the inverse relationship with the Classroom model as a delegate
+    public function classroomsAsDelegate()
+    {
+        return $this->hasMany(Classroom::class, 'delegate_id');
+    }
+
+    // Define the many-to-many relationship with the Classroom model for students
+    public function classroomsAsStudent()
+    {
+        return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id');
+    }
     /**
      * Get the attributes that should be cast.
      *
