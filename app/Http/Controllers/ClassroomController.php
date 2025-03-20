@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
@@ -49,6 +50,14 @@ class ClassroomController extends Controller
             'delegate_id' => $request->delegate_id,
         ]);
 
+        // Fetch the teacher and delegate details
+        $teacher = User::find($classroom->teacher_id);
+        $delegate = User::find($classroom->delegate_id);
+
+        // Generate asset paths for teacher and delegate images
+        $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
+        $delegateImage = $delegate ? asset('storage/' . $delegate->image) : null;
+
         return response()->json([
             'message' => 'Classroom created successfully',
             'classroom' => [
@@ -63,6 +72,27 @@ class ClassroomController extends Controller
                 'delegate_id' => $classroom->delegate_id,
                 'created_at' => $classroom->created_at,
                 'updated_at' => $classroom->updated_at,
+                'learners' => 0,
+                'teacher' => [
+                    'id' => $teacher->id,
+                    'name' => $teacher->name,
+                    'email' => $teacher->email,
+                    'email_verified_at' => $teacher->email_verified_at,
+                    'role' => $teacher->role,
+                    'created_at' => $teacher->created_at,
+                    'updated_at' => $teacher->updated_at,
+                    'image' => $teacherImage,
+                ],
+                'delegate' => $delegate ? [
+                    'id' => $delegate->id,
+                    'name' => $delegate->name,
+                    'email' => $delegate->email,
+                    'email_verified_at' => $delegate->email_verified_at,
+                    'role' => $delegate->role,
+                    'created_at' => $delegate->created_at,
+                    'updated_at' => $delegate->updated_at,
+                    'image' => $delegateImage,
+                ] : null,
             ]
         ], 201);
     }
