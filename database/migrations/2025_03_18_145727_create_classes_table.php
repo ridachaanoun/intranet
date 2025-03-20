@@ -16,10 +16,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('level');
-            $table->integer('level_value');
             $table->string('campus');
-            $table->integer('campus_value');
-            $table->integer('learners');
             $table->unsignedBigInteger('promotion_id')->nullable();
             $table->string('cover_image')->nullable();
             $table->unsignedBigInteger('teacher_id')->nullable();
