@@ -10,7 +10,7 @@ class Classroom extends Model
     use HasFactory;
 
     protected $fillable = [
-        'slug', 'name', 'level', 'level_value', 'campus', 'campus_value', 'learners', 'promotion_id', 'cover_image', 'teacher_id', 'delegate_id'
+        'slug', 'name', 'level', 'campus', 'promotion_id', 'cover_image', 'teacher_id', 'delegate_id'
     ];
 
     // Define the relationship with the Promotion model
