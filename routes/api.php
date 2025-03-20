@@ -20,6 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/user/{user}/profile', [UserDetailsController::class, 'updateProfile']);
     Route::put('/admin/user/{user}/role', [AdminController::class, 'updateUserRole']);
     Route::post('/admin/user/{user}/upload-image', [AdminController::class, 'uploadImage']);
-    Route::post('/classes', [ClassroomController::class, 'createClassroom']);
-    
+    Route::post('admin/classes', [ClassroomController::class, 'createClassroom']);
+    Route::post('admin/classrooms/{classroom}/students', [ClassroomController::class, 'addStudents']);
+
 });
