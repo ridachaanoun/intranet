@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CursusHistory;
 use App\Models\Promotion;
 use App\Models\User;
 use Auth;
@@ -9,8 +10,6 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Laravel\Passport\HasApiTokens;
 use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class AuthController extends Controller
 {
@@ -18,7 +17,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $this->authorize('create', User::class);
+            $this->authorize('admin', User::class);
     
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -43,6 +42,17 @@ class AuthController extends Controller
                 $user->personalInfo()->create([]);
                 $user->accountInfo()->create([]);
                 $user->profiles()->create([]);
+
+                CursusHistory::create([
+                    'student_id' => $user->id,
+                    'coach_id' => auth()->user()->id,
+                    'date' => now(),
+                    'event' => 'Registration',
+                    'status' => 'IN PROGRESS',
+                    'class_id' => null,
+                    'promotion_id' => null,
+                    'remarks' => 'Student registered'
+                ]);
             }
     
             return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);

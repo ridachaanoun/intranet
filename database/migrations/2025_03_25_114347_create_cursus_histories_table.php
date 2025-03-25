@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cursus_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id')->nullable();
+            $table->unsignedBigInteger('coach_id')->nullable();
             $table->date('date');
             $table->enum('event', ['Registration', 'Promotion', 'Class Change', 'SAS', '1ère Année', '2ème Année']);
             $table->enum('status', ['PASS', 'FAIL', 'IN PROGRESS']);
@@ -24,6 +25,7 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('student_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('coach_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('class_id')->references('id')->on('classrooms')->onDelete('set null');
             $table->foreign('promotion_id')->references('id')->on('promotions')->onDelete('set null');
         });

@@ -17,6 +17,7 @@ class CursusHistory extends Model
         'class_id',
         'promotion_id',
         'remarks',
+        'coach_id',
     ];
 
     public function student()
