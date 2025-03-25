@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\CursusHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -125,6 +126,23 @@ class ClassroomController extends Controller
                 // Add the student to the classroom
                 $classroom->students()->attach($student->id);
                 $studentsAdded[] = $student->id;
+
+                // Update the old CursusHistory record to "PASS" status
+                CursusHistory::where('student_id', $student->id)
+                ->where('status', 'IN PROGRESS')
+                ->update(['status' => 'PASS']);
+
+                // Create CursusHistory record
+                CursusHistory::create([
+                    'student_id' => $student->id,
+                    'coach_id' => auth()->user()->id,
+                    'date' => now(),
+                    'event' => $classroom->level,
+                    'status' => 'IN PROGRESS',
+                    'class_id' => $classroom->id,
+                    'promotion_id' => $classroom->promotion_id,
+                    'remarks' => 'Student added to classroom'
+                ]);
             }
         }
 
