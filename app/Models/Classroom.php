@@ -33,4 +33,9 @@ class Classroom extends Model
         return $this->belongsToMany(User::class, 'classroom_student', 'classroom_id', 'student_id')
                     ->where('role', 'student');
     }
+    public function cursusHistories()
+    {
+        return $this->hasMany(CursusHistory::class, 'class_id');
+    }
+
 }

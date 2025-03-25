@@ -250,9 +250,6 @@ class ClassroomController extends Controller
     ], 200);
     }
 
-    /**
-     * Delete a classroom.
-     */
     public function deleteClassroom(Classroom $classroom)
     {
         $this->authorize("admin", user::class);

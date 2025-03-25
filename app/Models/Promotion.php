@@ -12,4 +12,8 @@ class Promotion extends Model
     {
         return $this->hasMany(AccountInfo::class);
     }
+    public function cursusHistories()
+    {
+        return $this->hasMany(CursusHistory::class);
+    }
 }
