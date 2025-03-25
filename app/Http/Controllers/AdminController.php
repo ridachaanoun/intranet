@@ -11,7 +11,7 @@ class AdminController extends Controller
 use AuthorizesRequests;
     public function updateUserRole(Request $request, User $user)
     {
-        $this->authorize("create",$user);
+        $this->authorize("admin",$user);
 
         $validatedData = $request->validate([
             'role' => 'required|string|in:admin,user,student',
@@ -30,7 +30,7 @@ use AuthorizesRequests;
     public function uploadImage(Request $request,user $user)
     {
 
-        $this->authorize("create",$user);
+        $this->authorize("admin",$user);
         
         // Validate the request data
         $request->validate([

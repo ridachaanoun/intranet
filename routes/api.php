@@ -22,5 +22,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/admin/user/{user}/upload-image', [AdminController::class, 'uploadImage']);
     Route::post('admin/classes', [ClassroomController::class, 'createClassroom']);
     Route::post('admin/classrooms/{classroom}/students', [ClassroomController::class, 'addStudents']);
-
+    Route::put('admin/classrooms/{classroom}', [ClassroomController::class, 'updateClassroom']);
+    Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
 });

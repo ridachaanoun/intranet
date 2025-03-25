@@ -26,7 +26,7 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function admin(User $user): bool
     {
         return $user->role === 'admin';
     }

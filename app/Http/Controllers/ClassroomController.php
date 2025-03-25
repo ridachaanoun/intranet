@@ -13,7 +13,7 @@ class ClassroomController extends Controller
 
     public function createClassroom(Request $request)
     {
-        $this->authorize("create",user::class);
+        $this->authorize("admin",user::class);
         // Validate the request data
         $request->validate([
             'slug' => 'required|string|unique:classrooms,slug',
@@ -103,6 +103,8 @@ class ClassroomController extends Controller
 
     public function addStudents(Request $request, Classroom $classroom)
     {
+        $this->authorize("admin",user::class);
+
         // Validate the request data
         $request->validate([
             'student_ids' => 'required|array',
@@ -158,6 +160,107 @@ class ClassroomController extends Controller
                 'updated_at' => $classroom->updated_at,
                 'students' => $students,
             ]
+        ], 200);
+    }
+    public function updateClassroom(Request $request, Classroom $classroom)
+    {
+        $this->authorize("admin", User::class);
+
+       // Validate the request data
+       $request->validate([
+        'slug' => 'nullable|string|unique:classrooms,slug,' . $classroom->id,
+        'name' => 'nullable|string|max:255',
+        'level' => 'nullable|string|max:255',
+        'campus' => 'nullable|string|max:255',
+        'promotion_id' => 'nullable|exists:promotions,id',
+        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000',
+        'teacher_id' => 'nullable|exists:users,id',
+        'delegate_id' => 'nullable|exists:users,id',
+    ]);
+
+    // Handle the file upload
+    if ($request->hasFile('cover_image')) {
+        // Get the file from the request
+        $file = $request->file('cover_image');
+
+        // Define the file path and name
+        $filePath = 'classrooms_images';
+        
+        // Store the file
+        $path = $file->store($filePath, 'public');
+        $classroom->cover_image = $path;
+    }
+
+    // Update the classroom
+    $classroom->update(array_filter($request->only([
+        'slug',
+        'name',
+        'level',
+        'campus',
+        'promotion_id',
+        'teacher_id',
+        'delegate_id',
+    ])));
+
+    // Fetch the teacher and delegate details
+    $teacher = User::find($classroom->teacher_id);
+    $delegate = User::find($classroom->delegate_id);
+
+    // Generate asset paths for teacher and delegate images
+    $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
+    $delegateImage = $delegate ? asset('storage/' . $delegate->image) : null;
+
+    return response()->json([
+        'message' => 'Classroom updated successfully',
+        'request'=>$request->all(),
+        'classroom' => [
+            'id' => $classroom->id,
+            'slug' => $classroom->slug,
+            'name' => $classroom->name,
+            'level' => $classroom->level,
+            'campus' => $classroom->campus,
+            'promotion_id' => $classroom->promotion_id,
+            'cover_image' => asset('storage/' . $classroom->cover_image),
+            'teacher_id' => $classroom->teacher_id,
+            'delegate_id' => $classroom->delegate_id,
+            'created_at' => $classroom->created_at,
+            'updated_at' => $classroom->updated_at,
+            'learners' => $classroom->students()->count(),
+            'teacher' => [
+                'id' => $teacher->id,
+                'name' => $teacher->name,
+                'email' => $teacher->email,
+                'email_verified_at' => $teacher->email_verified_at,
+                'role' => $teacher->role,
+                'created_at' => $teacher->created_at,
+                'updated_at' => $teacher->updated_at,
+                'image' => $teacherImage,
+            ],
+            'delegate' => $delegate ? [
+                'id' => $delegate->id,
+                'name' => $delegate->name,
+                'email' => $delegate->email,
+                'email_verified_at' => $delegate->email_verified_at,
+                'role' => $delegate->role,
+                'created_at' => $delegate->created_at,
+                'updated_at' => $delegate->updated_at,
+                'image' => $delegateImage,
+            ] : null,
+        ]
+    ], 200);
+    }
+
+    /**
+     * Delete a classroom.
+     */
+    public function deleteClassroom(Classroom $classroom)
+    {
+        $this->authorize("admin", user::class);
+
+        $classroom->delete();
+
+        return response()->json([
+            'message' => 'Classroom deleted successfully'
         ], 200);
     }
 }
