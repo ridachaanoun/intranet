@@ -12,6 +12,20 @@ class ClassroomController extends Controller
 {
     use AuthorizesRequests ;
 
+    public function index(Request $request)
+    {
+        $request->validate([
+            'page' => 'integer|min:1',
+            'per_page' => 'integer|min:1|max:100',
+        ]);
+
+        $perPage = $request->get('per_page', 10);
+
+        $classrooms = Classroom::paginate($perPage);
+
+        return response()->json($classrooms);
+    }
+
     public function createClassroom(Request $request)
     {
         $this->authorize("admin",user::class);

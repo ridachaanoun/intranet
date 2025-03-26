@@ -24,4 +24,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('admin/classrooms/{classroom}/students', [ClassroomController::class, 'addStudents']);
     Route::put('admin/classrooms/{classroom}', [ClassroomController::class, 'updateClassroom']);
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
+    Route::get('/classrooms', [ClassroomController::class, 'index']);
 });
