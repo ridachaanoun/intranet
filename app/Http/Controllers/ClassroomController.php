@@ -118,7 +118,7 @@ class ClassroomController extends Controller
 
     public function addStudents(Request $request, Classroom $classroom)
     {
-        $this->authorize("admin",user::class);
+        $this->authorize("admin", User::class);
 
         // Validate the request data
         $request->validate([
@@ -128,6 +128,9 @@ class ClassroomController extends Controller
 
         $studentsAdded = [];
         $studentsAlreadyInClassroom = [];
+
+        // Fetch the teacher of the classroom
+        $teacher = User::find($classroom->teacher_id);
 
         foreach ($request->student_ids as $studentId) {
             // Find the student
@@ -143,13 +146,14 @@ class ClassroomController extends Controller
 
                 // Update the old CursusHistory record to "PASS" status
                 CursusHistory::where('student_id', $student->id)
-                ->where('status', 'IN PROGRESS')
-                ->update(['status' => 'PASS']);
+                    ->where('status', 'IN PROGRESS')
+                    ->update(['status' => 'PASS']);
 
-                // Create CursusHistory record
+                    
+                // Create new CursusHistory record
                 CursusHistory::create([
                     'student_id' => $student->id,
-                    'coach_id' => auth()->user()->id,
+                    'coach_id' => $teacher->id,
                     'date' => now(),
                     'event' => $classroom->level,
                     'status' => 'IN PROGRESS',
@@ -157,6 +161,12 @@ class ClassroomController extends Controller
                     'promotion_id' => $classroom->promotion_id,
                     'remarks' => 'Student added to classroom'
                 ]);
+
+                // Update student's level, classroom, and referent_coach fields
+                $student->level = $classroom->level;
+                $student->classroom = $classroom->name;
+                $student->referent_coach = $teacher->name;
+                $student->save();
             }
         }
 
@@ -194,6 +204,7 @@ class ClassroomController extends Controller
             ]
         ], 200);
     }
+
     public function updateClassroom(Request $request, Classroom $classroom)
     {
         $this->authorize("admin", User::class);
