@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -25,4 +26,5 @@ Route::middleware('auth:api')->group(function () {
     Route::put('admin/classrooms/{classroom}', [ClassroomController::class, 'updateClassroom']);
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
+    Route::get('/users', [UserController::class, 'getAllUsers']);
 });
