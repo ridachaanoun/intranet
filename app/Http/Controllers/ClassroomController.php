@@ -151,11 +151,12 @@ class ClassroomController extends Controller
 
                     
                 // Create new CursusHistory record
+                $event = ($student->level == $classroom->level) ? 'Class Change' : $classroom->level;
                 CursusHistory::create([
                     'student_id' => $student->id,
                     'coach_id' => $teacher->id,
                     'date' => now(),
-                    'event' => $classroom->level,
+                    'event' => $event,
                     'status' => 'IN PROGRESS',
                     'class_id' => $classroom->id,
                     'promotion_id' => $classroom->promotion_id,
