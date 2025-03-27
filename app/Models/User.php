@@ -51,13 +51,13 @@ class User extends Authenticatable
 
     public function classroomsAsStudent()
     {
-        return $this->belongsToMany(Classroom::class);
+        return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id');
     }
     public function cursusHistories()
     {
         return $this->hasMany(CursusHistory::class);
     }
-
+    
     protected function casts(): array
     {
         return [

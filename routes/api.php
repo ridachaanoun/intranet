@@ -29,4 +29,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::get('/user/details', [Loged_in_user::class, 'getUserDetails']);
+    Route::get('/user/classroom', [Loged_in_user::class, 'getUserClassroom']);
 });
