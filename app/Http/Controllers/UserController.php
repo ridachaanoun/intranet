@@ -19,7 +19,7 @@ class UserController extends Controller
         $perPage = $request->get('per_page', 100);
 
         // Paginate the users
-        $users = User::paginate($perPage);
+        $users = User::orderBy('created_at', 'desc')->paginate($perPage);
 
         // Format the users data
         $formattedUsers = $users->map(function ($user) {

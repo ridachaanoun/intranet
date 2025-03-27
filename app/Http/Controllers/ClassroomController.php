@@ -21,9 +21,31 @@ class ClassroomController extends Controller
 
         $perPage = $request->get('per_page', 10);
 
-        $classrooms = Classroom::paginate($perPage);
+        $classrooms = Classroom::orderBy('created_at', 'desc')->paginate($perPage);
 
-        return response()->json($classrooms);
+        $formattedClassrooms = $classrooms->map(function ($classroom) {
+            return [
+                'id' => $classroom->id,
+                'slug' => $classroom->slug,
+                'name' => $classroom->name,
+                'level' => $classroom->level,
+                'campus' => $classroom->campus,
+                'promotion_id' => $classroom->promotion_id,
+                'cover_image' => asset('storage/' . $classroom->cover_image),
+                'teacher_id' => $classroom->teacher_id,
+                'delegate_id' => $classroom->delegate_id,
+                'created_at' => $classroom->created_at,
+                'updated_at' => $classroom->updated_at,
+            ];
+        });
+
+        return response()->json([
+            'data' => $formattedClassrooms,
+            'current_page' => $classrooms->currentPage(),
+            'last_page' => $classrooms->lastPage(),
+            'per_page' => $classrooms->perPage(),
+            'total' => $classrooms->total(),
+        ]);
     }
 
     public function createClassroom(Request $request)
