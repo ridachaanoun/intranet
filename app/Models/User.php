@@ -41,21 +41,21 @@ class User extends Authenticatable
 
     public function classroomsAsTeacher()
     {
-        return $this->hasMany(Classroom::class, 'teacher_id');
+        return $this->hasMany(Classroom::class);
     }
 
     public function classroomsAsDelegate()
     {
-        return $this->hasMany(Classroom::class, 'delegate_id');
+        return $this->hasMany(Classroom::class);
     }
 
     public function classroomsAsStudent()
     {
-        return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id');
+        return $this->belongsToMany(Classroom::class);
     }
     public function cursusHistories()
     {
-        return $this->hasMany(CursusHistory::class, 'student_id');
+        return $this->hasMany(CursusHistory::class);
     }
 
     protected function casts(): array

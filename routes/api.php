@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\Loged_in_user;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,4 +28,5 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
+    Route::get('/user/details', [Loged_in_user::class, 'getUserDetails']);
 });
