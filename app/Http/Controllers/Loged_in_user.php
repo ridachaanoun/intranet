@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\Promotion;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -59,12 +60,16 @@ class Loged_in_user extends Controller
             $delegate->image_url = asset('storage/' . $delegate->image);
         }
 
+        $studentCount = $classroom->students()->count();
+        $promostion =   Promotion::find($classroom->promotion_id)->first();
         return response()->json([
             'id' => $classroom->id,
             'slug' => $classroom->slug,
             'name' => $classroom->name,
             'level' => $classroom->level,
             'campus' => $classroom->campus,
+            'Learners'=>$studentCount,
+            'promostion'=>$promostion,
             'promotion_id' => $classroom->promotion_id,
             'cover_image' => asset('storage/' . $classroom->cover_image),
             'teacher' => $teacher,
