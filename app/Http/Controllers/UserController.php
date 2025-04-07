@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Promotion;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -45,7 +46,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function getUserDetails(Request $request, User $user)
+    public function getUserDetails(User $user)
     {
 
         if (!$user) {
@@ -63,6 +64,61 @@ class UserController extends Controller
             'personal_info' => $personalInfo,
             'account_info' => $accountInfo,
             'profiles' => $profiles,
+        ], 200);
+    }
+
+    public function getClassroomDetailsByUserId(User $user)
+    {
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $classroom = $user->classroomsAsStudent()->latest()->first();
+
+        if (!$classroom) {
+            return response()->json(['message' => 'No classrooms found'], 404);
+        }
+
+        $students = $classroom->students()->get()->map(function ($student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'role' => $student->role,
+                'created_at' => $student->created_at,
+                'updated_at' => $student->updated_at,
+                'image_url' => asset('storage/' . $student->image),
+            ];
+        });
+
+        $teacher = $classroom->teacher()->first(['id', 'name', 'email', 'image']);
+        if ($teacher) {
+            $teacher->image_url = asset('storage/' . $teacher->image);
+        }
+
+        $delegate = $classroom->delegate()->first(['id', 'name', 'email', 'image']);
+        if ($delegate) {
+            $delegate->image_url = asset('storage/' . $delegate->image);
+        }
+
+        $studentCount = $classroom->students()->count();
+        $promotion = Promotion::find($classroom->promotion_id);
+
+        return response()->json([
+            'id' => $classroom->id,
+            'slug' => $classroom->slug,
+            'name' => $classroom->name,
+            'level' => $classroom->level,
+            'campus' => $classroom->campus,
+            'Learners' => $studentCount,
+            'promotion' => $promotion,
+            'promotion_id' => $classroom->promotion_id,
+            'cover_image' => asset('storage/' . $classroom->cover_image),
+            'teacher' => $teacher,
+            'delegate' => $delegate,
+            'created_at' => $classroom->created_at,
+            'updated_at' => $classroom->updated_at,
+            'students' => $students,
         ], 200);
     }
 }

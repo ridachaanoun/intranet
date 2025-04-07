@@ -35,4 +35,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user/cursus-history', [Loged_in_user::class, 'getUserCursusHistory']);
     Route::post('/teacher/assign-task', [TaskController::class, 'assignTask']);
     Route::get('/user-details/{user}', [UserController::class, 'getUserDetails']);
+    Route::get('/user-classroom/{user}',[UserController::class,'getClassroomDetailsByUserId']);
 });
