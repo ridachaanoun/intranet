@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\CursusHistory;
 use App\Models\Promotion;
 use Auth;
 use Illuminate\Http\Request;
@@ -78,6 +79,24 @@ class Loged_in_user extends Controller
             'updated_at' => $classroom->updated_at,
             'students' => $students,
         ]);
+    }
+
+    public function getUserCursusHistory()
+    {
+        $user = Auth::user();
+
+
+        $cursusHistory = $user->cursusHistories()->with(['student', 'coach', 'promotion'])->get();
+        $cursusHistory->each(function ($history) {
+            if ($history->coach) {
+                $history->coach->image_url = asset('storage/' . $history->coach->image);
+            }
+        });
+        if ($cursusHistory->isEmpty()) {
+            return response()->json(['message' => 'No CursusHistory found'], 404);
+        }
+
+        return response()->json(['cursus_history' => $cursusHistory]);
     }
 
 }

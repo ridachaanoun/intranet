@@ -30,4 +30,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::get('/user/details', [Loged_in_user::class, 'getUserDetails']);
     Route::get('/user/classroom', [Loged_in_user::class, 'getUserClassroom']);
+    Route::get('/user/cursus-history', [Loged_in_user::class, 'getUserCursusHistory']);
 });

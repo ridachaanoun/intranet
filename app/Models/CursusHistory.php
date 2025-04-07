@@ -34,4 +34,8 @@ class CursusHistory extends Model
     {
         return $this->belongsTo(Promotion::class, 'promotion_id');
     }
+    public function coach()
+    {
+        return $this->belongsTo(User::class, 'coach_id');
+    }
 }

@@ -55,9 +55,9 @@ class User extends Authenticatable
     }
     public function cursusHistories()
     {
-        return $this->hasMany(CursusHistory::class);
+        return $this->hasMany(CursusHistory::class,"student_id");
     }
-    
+
     protected function casts(): array
     {
         return [
