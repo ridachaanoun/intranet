@@ -17,8 +17,10 @@ class Loged_in_user extends Controller
         $personalInfo = $user->personalInfo()->first();
         $accountInfo = $user->accountInfo()->first();
         $profiles = $user->profiles()->first();
+        $user->image_url = asset('storage/'.$user->image);
 
         return response()->json([
+            'user'=>$user,
             'personal_info' => $personalInfo,
             'account_info' => $accountInfo,
             'profiles' => $profiles,

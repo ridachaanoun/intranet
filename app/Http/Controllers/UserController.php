@@ -44,4 +44,25 @@ class UserController extends Controller
             'total' => $users->total(),
         ]);
     }
+
+    public function getUserDetails(Request $request, User $user)
+    {
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $personalInfo = $user->personalInfo()->first();
+        $accountInfo = $user->accountInfo()->first();
+        $profiles = $user->profiles()->first();
+        
+        $user->image_url = asset('storage/'.$user->image);
+
+        return response()->json([
+            'user'=> $user,
+            'personal_info' => $personalInfo,
+            'account_info' => $accountInfo,
+            'profiles' => $profiles,
+        ], 200);
+    }
 }

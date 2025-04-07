@@ -14,7 +14,7 @@ class UserDetailsController extends Controller
 
     public function updatePersonalInfo(Request $request, User $user)
     {
-        $this->authorize('create', User::class);
+        $this->authorize('admin', User::class);
 
 
         $validatedData = $request->validate([
@@ -40,7 +40,7 @@ class UserDetailsController extends Controller
 
     public function updateAccountInfo(Request $request, User $user)
     {
-        $this->authorize('create', User::class);
+        $this->authorize('admin', User::class);
 
         $validatedData = $request->validate([
             'campus'             => 'nullable|string|max:255',
