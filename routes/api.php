@@ -38,4 +38,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user-details/{user}', [UserController::class, 'getUserDetails']);
     Route::get('/user-classroom/{user}',[UserController::class,'getClassroomDetailsByUserId']);
     Route::post('/teacher/absences', [AbsenceController::class, 'addAbsence']);
+    Route::get('/user/absences/{user}', [AbsenceController::class, 'getAbsenceDetailsByUserId']);
 });
