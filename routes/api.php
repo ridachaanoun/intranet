@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\Loged_in_user;
 use App\Http\Controllers\TaskController;
@@ -36,4 +37,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/teacher/assign-task', [TaskController::class, 'assignTask']);
     Route::get('/user-details/{user}', [UserController::class, 'getUserDetails']);
     Route::get('/user-classroom/{user}',[UserController::class,'getClassroomDetailsByUserId']);
+    Route::post('/teacher/absences', [AbsenceController::class, 'addAbsence']);
 });

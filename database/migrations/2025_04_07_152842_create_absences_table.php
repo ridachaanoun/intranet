@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('class');
             $table->string('session');
             $table->unsignedBigInteger('confirmed_by');
-            $table->foreign('confirmed_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('confirmed_by')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('reason')->nullable();
             $table->timestamps();
         });
