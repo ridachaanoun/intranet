@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Classroom;
 use App\Models\CursusHistory;
+use App\Models\Point;
 use App\Models\Promotion;
 use Auth;
 use Illuminate\Http\Request;
@@ -17,13 +18,17 @@ class Loged_in_user extends Controller
         $personalInfo = $user->personalInfo()->first();
         $accountInfo = $user->accountInfo()->first();
         $profiles = $user->profiles()->first();
+        $Points = $user->points()->get();
+        $Total_point = $Points->sum('points');
+            
         $user->image_url = asset('storage/'.$user->image);
-
+        $user->Total_points = $Total_point;
         return response()->json([
             'user'=>$user,
             'personal_info' => $personalInfo,
             'account_info' => $accountInfo,
             'profiles' => $profiles,
+            'Points' => $Points,
         ], 200);
     }
 

@@ -61,6 +61,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Absence::class);
     }
+    public function points() 
+    {
+        return $this->hasMany(Point::class,'student_id');
+    }
     protected function casts(): array
     {
         return [
