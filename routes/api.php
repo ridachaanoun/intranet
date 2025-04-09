@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\Loged_in_user;
+use App\Http\Controllers\PointController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInfoController;
@@ -39,4 +40,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user-classroom/{user}',[UserController::class,'getClassroomDetailsByUserId']);
     Route::post('/teacher/absences', [AbsenceController::class, 'addAbsence']);
     Route::get('/user/absences/{user}', [AbsenceController::class, 'getAbsenceDetailsByUserId']);
+    Route::post('/teacher/assign-points', [PointController::class, 'assignPoints']);
 });

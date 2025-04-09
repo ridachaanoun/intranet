@@ -37,7 +37,6 @@ use AuthorizesRequests;
         return response()->json(['message' => 'Absence added successfully', 'absence' => $absence], 201);
     }
     public function getAbsenceDetailsByUserId (User $user){
-        $Absence =  $user->absences;
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
