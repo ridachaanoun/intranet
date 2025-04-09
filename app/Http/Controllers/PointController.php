@@ -18,11 +18,8 @@ class PointController extends Controller
             'reason' => 'nullable|string',
         ]);
 
-        // Ensure the logged-in user is a teacher
         $teacher = Auth::user();
-        // if (!$teacher || $teacher->role !== 'teacher') {
-        //     return response()->json(['message' => 'Unauthorized'], 403);
-        // }
+
         $this->authorize("teacher",$teacher);
         $point = Point::create([
             'student_id' => $request->student_id,
