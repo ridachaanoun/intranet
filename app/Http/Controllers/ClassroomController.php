@@ -70,7 +70,7 @@ class ClassroomController extends Controller
 
             // Define the file path and name
             $filePath = 'classrooms_images';
-            
+
             // Store the file
             $path = $file->store($filePath, 'public');
         } else {
@@ -171,7 +171,7 @@ class ClassroomController extends Controller
                     ->where('status', 'IN PROGRESS')
                     ->update(['status' => 'PASS']);
 
-                    
+
                 // Create new CursusHistory record
                 $event = ($student->level == $classroom->level) ? 'Class Change' : $classroom->level;
                 CursusHistory::create([
@@ -251,7 +251,7 @@ class ClassroomController extends Controller
 
         // Define the file path and name
         $filePath = 'classrooms_images';
-        
+
         // Store the file
         $path = $file->store($filePath, 'public');
         $classroom->cover_image = $path;
@@ -350,5 +350,20 @@ class ClassroomController extends Controller
         $classroom->students()->detach($studentId);
 
         return response()->json(['message' => 'Student removed from the classroom successfully.'], 200);
+    }
+    public function getClassroomDelegates()
+    {
+
+    // Fetch classrooms with their delegates
+    $classrooms = Classroom::with('delegate:id,name', 'promotion') // Load delegate name and promotion details
+    ->select('id', 'name', 'campus', 'delegate_id', 'promotion_id') // Select only the required fields
+    ->get();
+
+    // Filter out classrooms where delegate is null
+    $filteredClassrooms = $classrooms->filter(function ($classroom) {
+        return $classroom->delegate !== null;
+    });
+
+    return response()->json($filteredClassrooms->values()); 
     }
 }

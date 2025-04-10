@@ -44,4 +44,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/password/change', [AuthController::class, 'changePassword']);
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     Route::delete('/classrooms/{classroomId}/students/{studentId}', [ClassroomController::class, 'removeStudent']);
+    Route::get('/classrooms/delegates', [ClassroomController::class, 'getClassroomDelegates']);
 });
