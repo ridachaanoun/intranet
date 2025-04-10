@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -60,5 +61,23 @@ use AuthorizesRequests;
         }
     
         return response()->json(['error' => 'Image upload failed'], 500);
+    }
+
+    public function deleteUser($id)
+    {
+
+        $this->authorize("admin",User::class);
+        // Find the user by ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+
+        // Delete the user
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully.'], 200);
     }
 }
