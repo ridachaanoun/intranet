@@ -94,7 +94,11 @@ class ClassroomController extends Controller
         // Fetch the teacher and delegate details
         $teacher = User::find($classroom->teacher_id);
         $delegate = User::find($classroom->delegate_id);
-
+        
+        $delegate->level = $classroom->level;
+        $delegate->classroom = $classroom->name;
+        $delegate->referent_coach = $teacher->name;
+        $delegate->save();
         // Generate asset paths for teacher and delegate images
         $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
         $delegateImage = $delegate ? asset('storage/' . $delegate->image) : null;
@@ -271,6 +275,10 @@ class ClassroomController extends Controller
     // Fetch the teacher and delegate details
     $teacher = User::find($classroom->teacher_id);
     $delegate = User::find($classroom->delegate_id);
+    $delegate->level = $classroom->level;
+    $delegate->classroom = $classroom->name;
+    $delegate->referent_coach = $teacher->name;
+    $delegate->save();
 
     // Generate asset paths for teacher and delegate images
     $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
@@ -355,7 +363,7 @@ class ClassroomController extends Controller
     {
 
     // Fetch classrooms with their delegates
-    $classrooms = Classroom::with('delegate:id,name', 'promotion') // Load delegate name and promotion details
+    $classrooms = Classroom::with('delegate', 'promotion') // Load delegate name and promotion details
     ->select('id', 'name', 'campus', 'delegate_id', 'promotion_id') // Select only the required fields
     ->get();
 
@@ -364,6 +372,6 @@ class ClassroomController extends Controller
         return $classroom->delegate !== null;
     });
 
-    return response()->json($filteredClassrooms->values()); 
+    return response()->json($filteredClassrooms->values());
     }
 }
