@@ -41,4 +41,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/teacher/absences', [AbsenceController::class, 'addAbsence']);
     Route::get('/user/absences/{user}', [AbsenceController::class, 'getAbsenceDetailsByUserId']);
     Route::post('/teacher/assign-points', [PointController::class, 'assignPoints']);
+    Route::post('/password/change', [AuthController::class, 'changePassword']);
+    
+
 });
