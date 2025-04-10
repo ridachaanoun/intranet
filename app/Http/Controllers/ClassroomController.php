@@ -326,4 +326,29 @@ class ClassroomController extends Controller
             'message' => 'Classroom deleted successfully'
         ], 200);
     }
+    public function removeStudent($classroomId, $studentId)
+    {
+        $this->authorize("admin",User::class);
+        // Retrieve the classroom
+        $classroom = Classroom::find($classroomId);
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found.'], 404);
+        }
+
+        // Retrieve the student
+        $student = User::find($studentId);
+        if (!$student || $student->role !== 'student') {
+            return response()->json(['message' => 'Student not found or invalid.'], 404);
+        }
+
+        // Check if the student is in the classroom
+        if (!$classroom->students()->where('student_id', $studentId)->exists()) {
+            return response()->json(['message' => 'Student is not in this classroom.'], 400);
+        }
+
+        // Remove the student from the classroom
+        $classroom->students()->detach($studentId);
+
+        return response()->json(['message' => 'Student removed from the classroom successfully.'], 200);
+    }
 }
