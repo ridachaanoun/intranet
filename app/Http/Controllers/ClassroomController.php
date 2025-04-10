@@ -94,8 +94,8 @@ class ClassroomController extends Controller
         // Fetch the teacher and delegate details
         $teacher = User::find($classroom->teacher_id);
         $delegate = User::find($classroom->delegate_id);
-        
-        $delegate->level = $classroom->level;
+
+        $delegate->level = $classroom->level === '1ère Année' ? 'A1' :($classroom->level === '2ème Année' ? 'A2' : $classroom->level);
         $delegate->classroom = $classroom->name;
         $delegate->referent_coach = $teacher->name;
         $delegate->save();
@@ -190,7 +190,7 @@ class ClassroomController extends Controller
                 ]);
 
                 // Update student's level, classroom, and referent_coach fields
-                $student->level = $classroom->level;
+                $student->level = $classroom->level === '1ère Année' ? 'A1' :($classroom->level === '2ème Année' ? 'A2' : $classroom->level);
                 $student->classroom = $classroom->name;
                 $student->referent_coach = $teacher->name;
                 $student->save();
@@ -275,7 +275,7 @@ class ClassroomController extends Controller
     // Fetch the teacher and delegate details
     $teacher = User::find($classroom->teacher_id);
     $delegate = User::find($classroom->delegate_id);
-    $delegate->level = $classroom->level;
+    $delegate->level = $classroom->level === '1ère Année' ? 'A1' :($classroom->level === '2ème Année' ? 'A2' : $classroom->level);
     $delegate->classroom = $classroom->name;
     $delegate->referent_coach = $teacher->name;
     $delegate->save();
