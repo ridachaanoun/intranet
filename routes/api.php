@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\HallOfFameController;
 use App\Http\Controllers\Loged_in_user;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\TaskController;
@@ -45,4 +46,6 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     Route::delete('/classrooms/{classroomId}/students/{studentId}', [ClassroomController::class, 'removeStudent']);
     Route::get('/classrooms/delegates', [ClassroomController::class, 'getClassroomDelegates']);
+    Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
+    
 });

@@ -371,7 +371,11 @@ class ClassroomController extends Controller
     $filteredClassrooms = $classrooms->filter(function ($classroom) {
         return $classroom->delegate !== null;
     });
+    $delegates= $filteredClassrooms->map(function ($class) {
+    $class->delegate->img_url= asset('storage/'. $class->delegate->image);
+        return $class;
+    });
 
-    return response()->json($filteredClassrooms->values());
+    return response()->json($delegates->values());
     }
 }
