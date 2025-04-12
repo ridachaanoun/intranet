@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountInfo;
 use App\Models\Classroom;
 use App\Models\CursusHistory;
 use App\Models\Point;
@@ -13,22 +14,26 @@ class Loged_in_user extends Controller
 {
     public function getUserDetails()
     {
+        // Get the authenticated user
         $user = Auth::user();
-
-        $personalInfo = $user->personalInfo()->first();
-        $accountInfo = $user->accountInfo()->first();
-        $profiles = $user->profiles()->first();
-        $Points = $user->points()->get();
-        $Total_point = $Points->sum('points');
-            
-        $user->image_url = asset('storage/'.$user->image);
-        $user->Total_points = $Total_point;
+    
+        // Eager load related data
+        $user->load([
+            'personalInfo',
+            'accountInfo.promotion',
+            'profiles',
+        ]);
+    
+        // Calculate total points
+        $totalPoints = $user->points->sum('points');
+    
+        // Add additional attributes
+        $user->image_url = asset('storage/' . $user->image);
+        $user->Total_points = $totalPoints;
+    
+        // Return response
         return response()->json([
-            'user'=>$user,
-            'personal_info' => $personalInfo,
-            'account_info' => $accountInfo,
-            'profiles' => $profiles,
-            'Points' => $Points,
+            'user' => $user,
         ], 200);
     }
 
