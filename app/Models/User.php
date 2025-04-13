@@ -65,6 +65,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Point::class,'student_id');
     }
+    public function tasksAssignedTo()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
+    public function tasksAssignedBy()
+    {
+        return $this->hasMany(Task::class, 'assigned_by');
+    }
     protected function casts(): array
     {
         return [
