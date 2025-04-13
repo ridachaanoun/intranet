@@ -46,4 +46,13 @@ class TaskController extends Controller
             'data' => $tasks,
         ]);
     }
+    public function getTasksAssignedByTeacher(User $teacher)
+    {
+       $tasks = $teacher->tasksAssignedBy()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+        ]);
+    }
 }

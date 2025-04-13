@@ -48,5 +48,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/classrooms/delegates', [ClassroomController::class, 'getClassroomDelegates']);
     Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
     Route::get('/student/tasks/{student}', [TaskController::class, 'getTasksForStudent']);
+    Route::get('/teacher/tasks/{teacher}', [TaskController::class, 'getTasksAssignedByTeacher']);
     
 });
