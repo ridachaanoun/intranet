@@ -47,5 +47,6 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/classrooms/{classroomId}/students/{studentId}', [ClassroomController::class, 'removeStudent']);
     Route::get('/classrooms/delegates', [ClassroomController::class, 'getClassroomDelegates']);
     Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
+    Route::get('/student/tasks/{student}', [TaskController::class, 'getTasksForStudent']);
     
 });

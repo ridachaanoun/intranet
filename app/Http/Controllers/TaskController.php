@@ -36,4 +36,14 @@ class TaskController extends Controller
 
         return response()->json(['message' => 'Task assigned successfully', 'task' => $task], 201);
     }
+
+    public function getTasksForStudent(User $student)
+    {
+       $tasks = $student->tasksAssignedTo()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+        ]);
+    }
 }

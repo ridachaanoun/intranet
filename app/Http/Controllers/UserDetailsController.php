@@ -65,7 +65,7 @@ class UserDetailsController extends Controller
     public function updateProfile(Request $request, User $user)
     {
         $this->authorize('update', $user);
-        $validatedData = $request->validate([
+        $validatedData = $request->validate([   
             'linkedin'   => 'nullable|url',
             'github'     => 'nullable|url',
             'website'    => 'nullable|url',
