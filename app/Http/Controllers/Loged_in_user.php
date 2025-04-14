@@ -98,7 +98,7 @@ class Loged_in_user extends Controller
         $user = Auth::user();
 
 
-        $cursusHistory = $user->cursusHistories()->with(['student', 'coach', 'promotion'])->get();
+        $cursusHistory = $user->cursusHistories()->with(['student', 'coach', 'promotion','class'])->get();
         $cursusHistory->each(function ($history) {
             if ($history->coach) {
                 $history->coach->image_url = asset('storage/' . $history->coach->image);

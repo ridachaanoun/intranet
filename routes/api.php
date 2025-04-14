@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsenceController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HallOfFameController;
 use App\Http\Controllers\Loged_in_user;
@@ -49,5 +50,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
     Route::get('/student/tasks/{student}', [TaskController::class, 'getTasksForStudent']);
     Route::get('/teacher/tasks/{teacher}', [TaskController::class, 'getTasksAssignedByTeacher']);
-    
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
 });
