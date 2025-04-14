@@ -50,5 +50,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
     Route::get('/student/tasks/{student}', [TaskController::class, 'getTasksForStudent']);
     Route::get('/teacher/tasks/{teacher}', [TaskController::class, 'getTasksAssignedByTeacher']);
-    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::post('/admin/announcements', [AnnouncementController::class, 'store']);
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
 });

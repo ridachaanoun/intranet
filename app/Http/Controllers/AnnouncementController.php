@@ -28,4 +28,14 @@ class AnnouncementController extends Controller
             'announcement' => $announcement,
         ], 201);
     }
+    public function index()
+    {
+        // Fetch all announcements
+        $announcements = Announcement::all();
+
+        return response()->json([
+            'message' => 'Announcements retrieved successfully',
+            'announcements' => $announcements,
+        ]);
+    }
 }
