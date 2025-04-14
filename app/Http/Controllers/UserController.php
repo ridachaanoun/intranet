@@ -48,11 +48,10 @@ class UserController extends Controller
 
     public function getUserDetails(User $user)
     {
-
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-
+    
         // Eager load related data
         $user->load([
             'personalInfo',
@@ -67,9 +66,13 @@ class UserController extends Controller
         $user->image_url = asset('storage/' . $user->image);
         $user->Total_points = $totalPoints;
     
+        // Get the latest classroom registration
+        $lastClassroom = $user->classrooms()->with('students')->latest('classroom_student.created_at')->first();
+    
         // Return response
         return response()->json([
             'user' => $user,
+            'lastClassroom' => $lastClassroom,
         ], 200);
     }
 
