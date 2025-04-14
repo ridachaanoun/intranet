@@ -53,20 +53,23 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $personalInfo = $user->personalInfo()->first();
-        $accountInfo = $user->accountInfo()->first();
-        $profiles = $user->profiles()->first();
-        $Points = $user->points()->get();
-        $Total_point = $Points->sum('points');
-        
-        $user->image_url = asset('storage/'.$user->image);
-        $user->Total_points = $Total_point;
+        // Eager load related data
+        $user->load([
+            'personalInfo',
+            'accountInfo.promotion',
+            'profiles',
+        ]);
+    
+        // Calculate total points
+        $totalPoints = $user->points->sum('points');
+    
+        // Add additional attributes
+        $user->image_url = asset('storage/' . $user->image);
+        $user->Total_points = $totalPoints;
+    
+        // Return response
         return response()->json([
-            'user'=> $user,
-            'personal_info' => $personalInfo,
-            'account_info' => $accountInfo,
-            'profiles' => $profiles,
-            'Points' => $Points,
+            'user' => $user,
         ], 200);
     }
 
