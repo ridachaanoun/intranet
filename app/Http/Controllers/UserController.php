@@ -52,24 +52,45 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
     
-        // Eager load related data
         $user->load([
             'personalInfo',
             'accountInfo.promotion',
             'profiles',
         ]);
     
-        // Calculate total points
+        // points
         $totalPoints = $user->points->sum('points');
     
-        // Add additional attributes
         $user->image_url = asset('storage/' . $user->image);
         $user->Total_points = $totalPoints;
     
         // Get the latest classroom registration
-        $lastClassroom = $user->classrooms()->with('students')->latest('classroom_student.created_at')->first();
+        $lastClassroom = $user->classrooms()
+            ->with(['students', 'delegate', 'promotion', 'teacher'])
+            ->latest('classroom_student.created_at')
+            ->first();
     
-        // Return response
+        // URL
+        if ($lastClassroom) {
+            $lastClassroom->cover_image = asset('storage/' . $lastClassroom->cover_image);
+    
+            // URLs
+            $lastClassroom->students->transform(function ($student) {
+                $student->image_url = asset('storage/' . $student->image);
+                return $student;
+            });
+    
+            // URL
+            if ($lastClassroom->delegate) {
+                $lastClassroom->delegate->image_url = asset('storage/' . $lastClassroom->delegate->image);
+            }
+    
+            // URL
+            if ($lastClassroom->teacher) {
+                $lastClassroom->teacher->image_url = asset('storage/' . $lastClassroom->teacher->image);
+            }
+        }
+    
         return response()->json([
             'user' => $user,
             'lastClassroom' => $lastClassroom,
