@@ -53,4 +53,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/teacher/tasks/{teacher}', [TaskController::class, 'getTasksAssignedByTeacher']);
     Route::post('/admin/announcements', [AnnouncementController::class, 'store']);
     Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::get('/classroom/{id}', [ClassroomController::class, 'getClassroomById']);
 });

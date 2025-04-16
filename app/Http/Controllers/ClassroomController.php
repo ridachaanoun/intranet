@@ -378,4 +378,49 @@ class ClassroomController extends Controller
 
     return response()->json($delegates->values());
     }
+
+    public function getClassroomById($id)
+    {
+        $classroom = Classroom::with(['teacher', 'delegate', 'students', 'promotion'])->find($id);
+    
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found.'], 404);
+        }
+    
+        // Format the classroom data
+        $formattedClassroom = [
+            'id' => $classroom->id,
+            'slug' => $classroom->slug,
+            'name' => $classroom->name,
+            'level' => $classroom->level,
+            'campus' => $classroom->campus,
+            'promotion_id' => $classroom->promotion_id,
+            'cover_image' => asset('storage/' . $classroom->cover_image),
+            'teacher' => $classroom->teacher ? [
+                'id' => $classroom->teacher->id,
+                'name' => $classroom->teacher->name,
+                'email' => $classroom->teacher->email,
+                'image_url' => asset('storage/' . $classroom->teacher->image),
+            ] : null,
+            'delegate' => $classroom->delegate ? [
+                'id' => $classroom->delegate->id,
+                'name' => $classroom->delegate->name,
+                'email' => $classroom->delegate->email,
+                'image_url' => asset('storage/' . $classroom->delegate->image),
+            ] : null,
+            'promotion' => $classroom->promotion,
+            'students' => $classroom->students->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->name,
+                    'email' => $student->email,
+                    'image_url' => asset('storage/' . $student->image),
+                ];
+            }),
+            'created_at' => $classroom->created_at,
+            'updated_at' => $classroom->updated_at,
+        ];
+    
+        return response()->json($formattedClassroom, 200);
+    }
 }
