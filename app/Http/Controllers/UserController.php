@@ -151,4 +151,19 @@ class UserController extends Controller
             'students' => $students,
         ], 200);
     }
+    public function getUserCursusHistory(User $user)
+    {
+
+        $cursusHistory = $user->cursusHistories()->with(['student', 'coach', 'promotion','class'])->get();
+        $cursusHistory->each(function ($history) {
+            if ($history->coach) {
+                $history->coach->image_url = asset('storage/' . $history->coach->image);
+            }
+        });
+        if ($cursusHistory->isEmpty()) {
+            return response()->json(['message' => 'No CursusHistory found'], 404);
+        }
+
+        return response()->json(['cursus_history' => $cursusHistory]);
+    }
 }
