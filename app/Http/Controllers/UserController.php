@@ -33,6 +33,7 @@ class UserController extends Controller
                 'level' => $user->level,
                 'classroom' => $user->classroom,
                 'referent_coach' => $user->referent_coach,
+                'campus' => $user->campus,
             ];
         });
 
