@@ -34,6 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
+    Route::get('/users/search', [UserController::class, 'searchUsers']);
     Route::get('/user/details', [Loged_in_user::class, 'getUserDetails']);
     Route::get('/user/classroom', [Loged_in_user::class, 'getUserClassroom']);
     Route::get('/user/cursus-history', [Loged_in_user::class, 'getUserCursusHistory']);

@@ -17,7 +17,7 @@ class UserController extends Controller
         ]);
 
         // Get the per_page value from the request or set a default value
-        $perPage = $request->get('per_page', 100);
+        $perPage = $request->get('per_page', 30);
 
         // Paginate the users
         $users = User::orderBy('created_at', 'desc')->paginate($perPage);
@@ -152,6 +152,7 @@ class UserController extends Controller
             'students' => $students,
         ], 200);
     }
+
     public function getUserCursusHistory(User $user)
     {
 
@@ -166,5 +167,81 @@ class UserController extends Controller
         }
 
         return response()->json(['cursus_history' => $cursusHistory]);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $request->validate([
+            'query' => 'nullable|string|max:255',
+            'role' => 'nullable|string|max:50',
+            'campus' => 'nullable|string|max:100',
+            'level' => 'nullable|string|max:50',
+            'page' => 'integer|min:1',
+            'per_page' => 'integer|min:1|max:500',
+        ]);
+
+        $query = $request->get('query');
+        $role = $request->get('role');
+        $campus = $request->get('campus');
+        $level = $request->get('level');
+        $perPage = $request->get('per_page', 30);
+        $page = $request->get('page', 1);
+
+        // Build 
+        $usersQuery = User::query();
+
+        if ($query) {
+            $usersQuery->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%");
+            });
+        }
+
+        if ($role) {
+            $usersQuery->where('role', $role);
+        }
+
+        if ($campus) {
+            $usersQuery->where('campus', 'like', "%{$campus}%");
+        }
+
+        if ($level) {
+            $usersQuery->where('level', $level);
+        }
+
+        $users = $usersQuery->orderBy('created_at', 'desc')->paginate($perPage);
+
+        if ($page > $users->lastPage()) {
+            return response()->json([
+                'users' => [],
+                'current_page' => $page,
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'message' => 'No users found on this page.',
+            ]);
+        }
+
+        // Format the users data
+        $formattedUsers = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'image' => asset('storage/' . $user->image),
+                'campus' => $user->campus,
+                'level' => $user->level,
+            ];
+        });
+
+        // Return
+        return response()->json([
+            'users' => $formattedUsers,
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
+            'per_page' => $users->perPage(),
+            'total' => $users->total(),
+        ]);
     }
 }
