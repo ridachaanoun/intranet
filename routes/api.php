@@ -15,8 +15,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserDetailsController;
 use App\Http\Controllers\AdminController;
 
-
-
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
@@ -33,6 +31,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('admin/classrooms/{classroom}', [ClassroomController::class, 'updateClassroom']);
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
+    Route::get('/classrooms/search', [ClassroomController::class, 'searchClassrooms']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::get('/users/search', [UserController::class, 'searchUsers']);
     Route::get('/user/details', [Loged_in_user::class, 'getUserDetails']);

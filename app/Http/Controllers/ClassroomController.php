@@ -423,4 +423,85 @@ class ClassroomController extends Controller
     
         return response()->json($formattedClassroom, 200);
     }
+
+    public function searchClassrooms(Request $request)
+    {
+        $request->validate([
+            'query' => 'nullable|string|max:255',
+            'campus' => 'nullable|string|max:100',
+            'level' => 'nullable|string|max:50',
+            'page' => 'integer|min:1',
+            'per_page' => 'integer|min:1|max:100',
+        ]);
+
+        $query = $request->get('query');
+        $campus = $request->get('campus');
+        $level = $request->get('level');
+        $perPage = $request->get('per_page', 10);
+
+        $classroomsQuery = Classroom::with(['teacher', 'delegate', 'students', 'promotion'])->orderBy('created_at', 'desc');
+
+        if ($query) {
+            $classroomsQuery->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('slug', 'like', "%{$query}%");
+            });
+        }
+
+        if ($campus) {
+            $classroomsQuery->where('campus', 'like', "%{$campus}%");
+        }
+
+        if ($level) {
+            $classroomsQuery->where('level', $level);
+        }
+
+        $classrooms = $classroomsQuery->paginate($perPage);
+
+        // Format classrooms data
+        $formattedClassrooms = $classrooms->map(function ($classroom) {
+            return [
+                'id' => $classroom->id,
+                'slug' => $classroom->slug,
+                'name' => $classroom->name,
+                'level' => $classroom->level,
+                'campus' => $classroom->campus,
+                'promotion' => $classroom->promotion ? [
+                    'id' => $classroom->promotion->id,
+                    'year' => $classroom->promotion->year,
+                ] : null,
+                'cover_image' => asset('storage/' . $classroom->cover_image),
+                'teacher' => $classroom->teacher ? [
+                    'id' => $classroom->teacher->id,
+                    'name' => $classroom->teacher->name,
+                    'email' => $classroom->teacher->email,
+                    'image_url' => asset('storage/' . $classroom->teacher->image),
+                ] : null,
+                'delegate' => $classroom->delegate ? [
+                    'id' => $classroom->delegate->id,
+                    'name' => $classroom->delegate->name,
+                    'email' => $classroom->delegate->email,
+                    'image_url' => asset('storage/' . $classroom->delegate->image),
+                ] : null,
+                'students' => $classroom->students->map(function ($student) {
+                    return [
+                        'id' => $student->id,
+                        'name' => $student->name,
+                        'email' => $student->email,
+                        'image_url' => asset('storage/' . $student->image),
+                    ];
+                }),
+                'created_at' => $classroom->created_at,
+                'updated_at' => $classroom->updated_at,
+            ];
+        });
+
+        return response()->json([
+            'classrooms' => $formattedClassrooms,
+            'current_page' => $classrooms->currentPage(),
+            'last_page' => $classrooms->lastPage(),
+            'per_page' => $classrooms->perPage(),
+            'total' => $classrooms->total(),
+        ]);
+    }
 }
