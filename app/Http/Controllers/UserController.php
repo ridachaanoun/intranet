@@ -22,24 +22,9 @@ class UserController extends Controller
         // Paginate the users
         $users = User::orderBy('created_at', 'desc')->paginate($perPage);
 
-        // Format the users data
-        $formattedUsers = $users->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'image' => asset('storage/' . $user->image),
-                'level' => $user->level,
-                'classroom' => $user->classroom,
-                'referent_coach' => $user->referent_coach,
-                'campus' => $user->campus,
-            ];
-        });
-
-        // Return the paginated and formatted users data
+        // Return the paginated users data
         return response()->json([
-            'users' => $formattedUsers,
+            'users' => $users->items(),
             'current_page' => $users->currentPage(),
             'last_page' => $users->lastPage(),
             'per_page' => $users->perPage(),
@@ -52,46 +37,23 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-    
+
         $user->load([
             'personalInfo',
             'accountInfo.promotion',
             'profiles',
         ]);
-    
-        // points
+
+        // Calculate total points
         $totalPoints = $user->points->sum('points');
-    
-        $user->image_url = asset('storage/' . $user->image);
         $user->Total_points = $totalPoints;
-    
+
         // Get the latest classroom registration
         $lastClassroom = $user->classrooms()
             ->with(['students', 'delegate', 'promotion', 'teacher'])
             ->latest('classroom_student.created_at')
             ->first();
-    
-        // URL
-        if ($lastClassroom) {
-            $lastClassroom->cover_image = asset('storage/' . $lastClassroom->cover_image);
-    
-            // URLs
-            $lastClassroom->students->transform(function ($student) {
-                $student->image_url = asset('storage/' . $student->image);
-                return $student;
-            });
-    
-            // URL
-            if ($lastClassroom->delegate) {
-                $lastClassroom->delegate->image_url = asset('storage/' . $lastClassroom->delegate->image);
-            }
-    
-            // URL
-            if ($lastClassroom->teacher) {
-                $lastClassroom->teacher->image_url = asset('storage/' . $lastClassroom->teacher->image);
-            }
-        }
-    
+
         return response()->json([
             'user' => $user,
             'lastClassroom' => $lastClassroom,
@@ -110,58 +72,27 @@ class UserController extends Controller
             return response()->json(['message' => 'No classrooms found'], 404);
         }
 
-        $students = $classroom->students()->get()->map(function ($student) {
-            return [
-                'id' => $student->id,
-                'name' => $student->name,
-                'email' => $student->email,
-                'role' => $student->role,
-                'created_at' => $student->created_at,
-                'updated_at' => $student->updated_at,
-                'image_url' => asset('storage/' . $student->image),
-            ];
-        });
+        $students = $classroom->students()->get();
 
         $teacher = $classroom->teacher()->first(['id', 'name', 'email', 'image']);
-        if ($teacher) {
-            $teacher->image_url = asset('storage/' . $teacher->image);
-        }
-
-        $delegate = $classroom->delegate()->first(['id', 'name', 'email', 'image']);
-        if ($delegate) {
-            $delegate->image_url = asset('storage/' . $delegate->image);
-        }
 
         $studentCount = $classroom->students()->count();
         $promotion = Promotion::find($classroom->promotion_id);
+        $delegate = $classroom->delegate()->get();
+        $classroom->Learners = $studentCount;
+        $classroom->promotion = $promotion;
+        $classroom->teacher = $teacher;
+        $classroom->delegate = $delegate;
+        $classroom->students = $students;
 
-        return response()->json([
-            'id' => $classroom->id,
-            'slug' => $classroom->slug,
-            'name' => $classroom->name,
-            'level' => $classroom->level,
-            'campus' => $classroom->campus,
-            'Learners' => $studentCount,
-            'promotion' => $promotion,
-            'promotion_id' => $classroom->promotion_id,
-            'cover_image' => asset('storage/' . $classroom->cover_image),
-            'teacher' => $teacher,
-            'delegate' => $delegate,
-            'created_at' => $classroom->created_at,
-            'updated_at' => $classroom->updated_at,
-            'students' => $students,
-        ], 200);
+        return response()->json($classroom, 200);
     }
 
     public function getUserCursusHistory(User $user)
     {
 
         $cursusHistory = $user->cursusHistories()->with(['student', 'coach', 'promotion','class'])->get();
-        $cursusHistory->each(function ($history) {
-            if ($history->coach) {
-                $history->coach->image_url = asset('storage/' . $history->coach->image);
-            }
-        });
+
         if ($cursusHistory->isEmpty()) {
             return response()->json(['message' => 'No CursusHistory found'], 404);
         }
@@ -222,22 +153,9 @@ class UserController extends Controller
             ]);
         }
 
-        // Format the users data
-        $formattedUsers = $users->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'image' => asset('storage/' . $user->image),
-                'campus' => $user->campus,
-                'level' => $user->level,
-            ];
-        });
-
         // Return
         return response()->json([
-            'users' => $formattedUsers,
+            'users' => $users->items(),
             'current_page' => $users->currentPage(),
             'last_page' => $users->lastPage(),
             'per_page' => $users->perPage(),
