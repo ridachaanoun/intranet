@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserDetailsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PromotionController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -54,4 +55,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/admin/announcements', [AnnouncementController::class, 'store']);
     Route::get('/announcements', [AnnouncementController::class, 'index']);
     Route::get('/classroom/{id}', [ClassroomController::class, 'getClassroomById']);
+    Route::get('/promotions', [PromotionController::class, 'getAllPromotions']);
 });
