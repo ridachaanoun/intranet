@@ -18,12 +18,17 @@ class User extends Authenticatable
         'role',
         'image',
         'campus', 
+        'level', 
+        'classroom', 
+        'referent_coach', 
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    protected $appends = ['image_url'];
 
     public function personalInfo()
     {
@@ -79,6 +84,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id');
     }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
     protected function casts(): array
     {
         return [
