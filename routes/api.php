@@ -16,6 +16,7 @@ use App\Http\Controllers\UserDetailsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -58,4 +59,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/classroom/{id}', [ClassroomController::class, 'getClassroomById']);
     Route::get('/promotions', [PromotionController::class, 'getAllPromotions']);
     Route::get('/students', [StudentController::class, 'getAllStudents']);
+    Route::get('/teachers', [TeacherController::class, 'getAllTeachers']);
 });
