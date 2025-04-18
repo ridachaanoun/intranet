@@ -13,6 +13,8 @@ class Classroom extends Model
         'slug', 'name', 'level', 'campus', 'promotion_id', 'cover_image', 'teacher_id', 'delegate_id'
     ];
 
+    protected $appends = ['cover_image_url'];
+
     public function promotion()
     {
         return $this->belongsTo(Promotion::class);
@@ -37,5 +39,8 @@ class Classroom extends Model
     {
         return $this->hasMany(CursusHistory::class, 'class_id');
     }
-
+    public function getCoverImageUrlAttribute()
+    {
+        return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
+    }
 }
