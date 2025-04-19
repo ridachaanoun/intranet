@@ -23,24 +23,8 @@ class ClassroomController extends Controller
 
         $classrooms = Classroom::orderBy('created_at', 'desc')->paginate($perPage);
 
-        $formattedClassrooms = $classrooms->map(function ($classroom) {
-            return [
-                'id' => $classroom->id,
-                'slug' => $classroom->slug,
-                'name' => $classroom->name,
-                'level' => $classroom->level,
-                'campus' => $classroom->campus,
-                'promotion_id' => $classroom->promotion_id,
-                'cover_image' => asset('storage/' . $classroom->cover_image),
-                'teacher_id' => $classroom->teacher_id,
-                'delegate_id' => $classroom->delegate_id,
-                'created_at' => $classroom->created_at,
-                'updated_at' => $classroom->updated_at,
-            ];
-        });
-
         return response()->json([
-            'data' => $formattedClassrooms,
+            'data' => $classrooms->items(),
             'current_page' => $classrooms->currentPage(),
             'last_page' => $classrooms->lastPage(),
             'per_page' => $classrooms->perPage(),
@@ -50,7 +34,8 @@ class ClassroomController extends Controller
 
     public function createClassroom(Request $request)
     {
-        $this->authorize("admin",user::class);
+        $this->authorize("admin", User::class);
+
         // Validate the request data
         $request->validate([
             'slug' => 'required|string|unique:classrooms,slug',
@@ -65,18 +50,11 @@ class ClassroomController extends Controller
 
         // Handle the file upload
         if ($request->hasFile('cover_image')) {
-            // Get the file from the request
             $file = $request->file('cover_image');
-
-            // Define the file path and name
             $filePath = 'classrooms_images';
-
-            // Store the file
             $path = $file->store($filePath, 'public');
         } else {
-            return response()->json([
-                'message' => 'Image upload failed'
-            ], 500);
+            return response()->json(['message' => 'Image upload failed'], 500);
         }
 
         // Create the classroom
@@ -95,50 +73,17 @@ class ClassroomController extends Controller
         $teacher = User::find($classroom->teacher_id);
         $delegate = User::find($classroom->delegate_id);
 
-        $delegate->level = $classroom->level === '1ère Année' ? 'A1' :($classroom->level === '2ème Année' ? 'A2' : $classroom->level);
-        $delegate->classroom = $classroom->name;
-        $delegate->referent_coach = $teacher->name;
-        $delegate->save();
-        // Generate asset paths for teacher and delegate images
-        $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
-        $delegateImage = $delegate ? asset('storage/' . $delegate->image) : null;
+        // Update delegate attributes
+        if ($delegate) {
+            $delegate->level = $classroom->level === '1ère Année' ? 'A1' : ($classroom->level === '2ème Année' ? 'A2' : $classroom->level);
+            $delegate->classroom = $classroom->name;
+            $delegate->referent_coach = $teacher->name;
+            $delegate->save();
+        }
 
         return response()->json([
             'message' => 'Classroom created successfully',
-            'classroom' => [
-                'id' => $classroom->id,
-                'slug' => $classroom->slug,
-                'name' => $classroom->name,
-                'level' => $classroom->level,
-                'campus' => $classroom->campus,
-                'promotion_id' => $classroom->promotion_id,
-                'cover_image' => asset('storage/' . $path),
-                'teacher_id' => $classroom->teacher_id,
-                'delegate_id' => $classroom->delegate_id,
-                'created_at' => $classroom->created_at,
-                'updated_at' => $classroom->updated_at,
-                'learners' => 0,
-                'teacher' => [
-                    'id' => $teacher->id,
-                    'name' => $teacher->name,
-                    'email' => $teacher->email,
-                    'email_verified_at' => $teacher->email_verified_at,
-                    'role' => $teacher->role,
-                    'created_at' => $teacher->created_at,
-                    'updated_at' => $teacher->updated_at,
-                    'image' => $teacherImage,
-                ],
-                'delegate' => $delegate ? [
-                    'id' => $delegate->id,
-                    'name' => $delegate->name,
-                    'email' => $delegate->email,
-                    'email_verified_at' => $delegate->email_verified_at,
-                    'role' => $delegate->role,
-                    'created_at' => $delegate->created_at,
-                    'updated_at' => $delegate->updated_at,
-                    'image' => $delegateImage,
-                ] : null,
-            ]
+            'classroom' => $classroom, // Directly return the classroom model
         ], 201);
     }
 
@@ -199,36 +144,12 @@ class ClassroomController extends Controller
 
         // Load the students with their asset URLs
         $classroom->load('students');
-        $students = $classroom->students->unique('id')->map(function ($student) {
-            return [
-                'id' => $student->id,
-                'name' => $student->name,
-                'email' => $student->email,
-                'role' => $student->role,
-                'created_at' => $student->created_at,
-                'updated_at' => $student->updated_at,
-                'image_url' => asset('storage/' . $student->image),
-            ];
-        });
 
         return response()->json([
             'message' => 'Students added to classroom successfully',
             'students_added' => $studentsAdded,
             'students_already_in_classroom' => $studentsAlreadyInClassroom,
-            'classroom' => [
-                'id' => $classroom->id,
-                'slug' => $classroom->slug,
-                'name' => $classroom->name,
-                'level' => $classroom->level,
-                'campus' => $classroom->campus,
-                'promotion_id' => $classroom->promotion_id,
-                'cover_image' => asset('storage/' . $classroom->cover_image),
-                'teacher_id' => $classroom->teacher_id,
-                'delegate_id' => $classroom->delegate_id,
-                'created_at' => $classroom->created_at,
-                'updated_at' => $classroom->updated_at,
-                'students' => $students,
-            ]
+            'classroom' => $classroom
         ], 200);
     }
 
@@ -280,47 +201,11 @@ class ClassroomController extends Controller
     $delegate->referent_coach = $teacher->name;
     $delegate->save();
 
-    // Generate asset paths for teacher and delegate images
-    $teacherImage = $teacher ? asset('storage/' . $teacher->image) : null;
-    $delegateImage = $delegate ? asset('storage/' . $delegate->image) : null;
-
+        $classroom->delegate = $delegate;
+        $classroom->teacher = $teacher;
     return response()->json([
         'message' => 'Classroom updated successfully',
-        'request'=>$request->all(),
-        'classroom' => [
-            'id' => $classroom->id,
-            'slug' => $classroom->slug,
-            'name' => $classroom->name,
-            'level' => $classroom->level,
-            'campus' => $classroom->campus,
-            'promotion_id' => $classroom->promotion_id,
-            'cover_image' => asset('storage/' . $classroom->cover_image),
-            'teacher_id' => $classroom->teacher_id,
-            'delegate_id' => $classroom->delegate_id,
-            'created_at' => $classroom->created_at,
-            'updated_at' => $classroom->updated_at,
-            'learners' => $classroom->students()->count(),
-            'teacher' => [
-                'id' => $teacher->id,
-                'name' => $teacher->name,
-                'email' => $teacher->email,
-                'email_verified_at' => $teacher->email_verified_at,
-                'role' => $teacher->role,
-                'created_at' => $teacher->created_at,
-                'updated_at' => $teacher->updated_at,
-                'image' => $teacherImage,
-            ],
-            'delegate' => $delegate ? [
-                'id' => $delegate->id,
-                'name' => $delegate->name,
-                'email' => $delegate->email,
-                'email_verified_at' => $delegate->email_verified_at,
-                'role' => $delegate->role,
-                'created_at' => $delegate->created_at,
-                'updated_at' => $delegate->updated_at,
-                'image' => $delegateImage,
-            ] : null,
-        ]
+        'classroom' => $classroom
     ], 200);
     }
 
@@ -371,57 +256,19 @@ class ClassroomController extends Controller
     $filteredClassrooms = $classrooms->filter(function ($classroom) {
         return $classroom->delegate !== null;
     });
-    $delegates= $filteredClassrooms->map(function ($class) {
-    $class->delegate->img_url= asset('storage/'. $class->delegate->image);
-        return $class;
-    });
 
-    return response()->json($delegates->values());
+    return response()->json($filteredClassrooms->values());
     }
 
     public function getClassroomById($id)
     {
         $classroom = Classroom::with(['teacher', 'delegate', 'students', 'promotion'])->find($id);
-    
+
         if (!$classroom) {
             return response()->json(['message' => 'Classroom not found.'], 404);
         }
-    
-        // Format the classroom data
-        $formattedClassroom = [
-            'id' => $classroom->id,
-            'slug' => $classroom->slug,
-            'name' => $classroom->name,
-            'level' => $classroom->level,
-            'campus' => $classroom->campus,
-            'promotion_id' => $classroom->promotion_id,
-            'cover_image' => asset('storage/' . $classroom->cover_image),
-            'teacher' => $classroom->teacher ? [
-                'id' => $classroom->teacher->id,
-                'name' => $classroom->teacher->name,
-                'email' => $classroom->teacher->email,
-                'image_url' => asset('storage/' . $classroom->teacher->image),
-            ] : null,
-            'delegate' => $classroom->delegate ? [
-                'id' => $classroom->delegate->id,
-                'name' => $classroom->delegate->name,
-                'email' => $classroom->delegate->email,
-                'image_url' => asset('storage/' . $classroom->delegate->image),
-            ] : null,
-            'promotion' => $classroom->promotion,
-            'students' => $classroom->students->map(function ($student) {
-                return [
-                    'id' => $student->id,
-                    'name' => $student->name,
-                    'email' => $student->email,
-                    'image_url' => asset('storage/' . $student->image),
-                ];
-            }),
-            'created_at' => $classroom->created_at,
-            'updated_at' => $classroom->updated_at,
-        ];
-    
-        return response()->json($formattedClassroom, 200);
+
+        return response()->json($classroom, 200); // Directly return the classroom model
     }
 
     public function searchClassrooms(Request $request)
@@ -458,46 +305,8 @@ class ClassroomController extends Controller
 
         $classrooms = $classroomsQuery->paginate($perPage);
 
-        // Format classrooms data
-        $formattedClassrooms = $classrooms->map(function ($classroom) {
-            return [
-                'id' => $classroom->id,
-                'slug' => $classroom->slug,
-                'name' => $classroom->name,
-                'level' => $classroom->level,
-                'campus' => $classroom->campus,
-                'promotion' => $classroom->promotion ? [
-                    'id' => $classroom->promotion->id,
-                    'year' => $classroom->promotion->year,
-                ] : null,
-                'cover_image' => asset('storage/' . $classroom->cover_image),
-                'teacher' => $classroom->teacher ? [
-                    'id' => $classroom->teacher->id,
-                    'name' => $classroom->teacher->name,
-                    'email' => $classroom->teacher->email,
-                    'image_url' => asset('storage/' . $classroom->teacher->image),
-                ] : null,
-                'delegate' => $classroom->delegate ? [
-                    'id' => $classroom->delegate->id,
-                    'name' => $classroom->delegate->name,
-                    'email' => $classroom->delegate->email,
-                    'image_url' => asset('storage/' . $classroom->delegate->image),
-                ] : null,
-                'students' => $classroom->students->map(function ($student) {
-                    return [
-                        'id' => $student->id,
-                        'name' => $student->name,
-                        'email' => $student->email,
-                        'image_url' => asset('storage/' . $student->image),
-                    ];
-                }),
-                'created_at' => $classroom->created_at,
-                'updated_at' => $classroom->updated_at,
-            ];
-        });
-
         return response()->json([
-            'classrooms' => $formattedClassrooms,
+            'classrooms' => $classrooms->items(),
             'current_page' => $classrooms->currentPage(),
             'last_page' => $classrooms->lastPage(),
             'per_page' => $classrooms->perPage(),
