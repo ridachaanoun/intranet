@@ -15,7 +15,7 @@ use AuthorizesRequests;
         $this->authorize("admin",$user);
 
         $validatedData = $request->validate([
-            'role' => 'required|string|in:admin,user,student',
+            'role' => 'required|string|in:admin,teacher,student',
         ]);
 
         // Update the user's role

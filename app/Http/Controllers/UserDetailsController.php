@@ -45,7 +45,7 @@ class UserDetailsController extends Controller
         $validatedData = $request->validate([
             'campus'             => 'nullable|string|max:255',
             'registration_date'  => 'nullable|date',
-            'promotion_id'     => 'nullable|string|max:255',
+            'promotion_id'     => 'nullable|max:255',
             'email_login'        => 'nullable|string|email|max:255',
             'username'           => 'nullable|string|max:255',
             'password'           => 'nullable|string|min:6',

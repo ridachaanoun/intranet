@@ -29,9 +29,9 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/user/{user}/profile', [UserDetailsController::class, 'updateProfile']);
     Route::put('/admin/user/{user}/role', [AdminController::class, 'updateUserRole']);
     Route::post('/admin/user/{user}/upload-image', [AdminController::class, 'uploadImage']);
-    Route::post('admin/classes', [ClassroomController::class, 'createClassroom']);
-    Route::post('admin/classrooms/{classroom}/students', [ClassroomController::class, 'addStudents']);
-    Route::put('admin/classrooms/{classroom}', [ClassroomController::class, 'updateClassroom']);
+    Route::post('admin/classroom', [ClassroomController::class, 'createClassroom']);
+    Route::post('admin/classroom/{classroom}/students', [ClassroomController::class, 'addStudents']);
+    Route::put('admin/classroom/{classroom}', [ClassroomController::class, 'updateClassroom']);
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/classrooms/search', [ClassroomController::class, 'searchClassrooms']);
