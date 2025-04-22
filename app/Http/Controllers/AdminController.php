@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CursusHistory;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -21,6 +22,24 @@ use AuthorizesRequests;
         // Update the user's role
         $user->role = $validatedData['role'];
         $user->save();
+
+        if ($user->role === 'student' && !$user->personalInfo) {    
+            // Create related empty records
+            $user->personalInfo()->create([]);
+            $user->accountInfo()->create([]);
+            $user->profiles()->create([]);
+
+            CursusHistory::create([
+                'student_id' => $user->id,
+                'coach_id' => auth()->user()->id,
+                'date' => now(),
+                'event' => 'Registration',
+                'status' => 'PASS',
+                'class_id' => null,
+                'promotion_id' => null,
+                'remarks' => 'change role to student'
+            ]);
+        }
 
         return response()->json([
             'message' => 'User role updated successfully',
