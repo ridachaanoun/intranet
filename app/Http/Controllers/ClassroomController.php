@@ -142,7 +142,6 @@ class ClassroomController extends Controller
             }
         }
 
-        // Load the students with their asset URLs
         $classroom->load('students');
 
         return response()->json([
@@ -244,6 +243,52 @@ class ClassroomController extends Controller
 
         return response()->json(['message' => 'Student removed from the classroom successfully.'], 200);
     }
+
+    public function removeStudents(Request $request, $classroomId)
+    {
+        $this->authorize("admin", User::class);
+
+        // Validate the request data
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id',
+        ]);
+
+        // Retrieve the classroom
+        $classroom = Classroom::find($classroomId);
+        if (!$classroom) {
+            return response()->json(['message' => 'Classroom not found.'], 404);
+        }
+
+        // Retrieve the students
+        $students = User::whereIn('id', $request->student_ids)->where('role', 'student')->get();
+
+        if ($students->isEmpty()) {
+            return response()->json(['message' => 'No valid students found to remove.'], 404);
+        }
+
+        // Check if the students are in the classroom
+        $studentsNotInClassroom = [];
+        $studentsRemoved = [];
+
+        foreach ($students as $student) {
+            if (!$classroom->students()->where('student_id', $student->id)->exists()) {
+                $studentsNotInClassroom[] = $student->id;
+            } else {
+                // Remove the student from the classroom
+                $classroom->students()->detach($student->id);
+                $studentsRemoved[] = $student->id;
+            }
+        }
+        $classroom->load('students');
+        return response()->json([
+            'message' => 'Students removed from the classroom successfully.',
+            'students_removed' => $studentsRemoved,
+            'students_not_in_classroom' => $studentsNotInClassroom,
+            'classroom' => $classroom,
+        ], 200);
+    }
+
     public function getClassroomDelegates()
     {
 

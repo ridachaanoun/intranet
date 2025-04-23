@@ -30,8 +30,8 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/admin/user/{user}/role', [AdminController::class, 'updateUserRole']);
     Route::post('/admin/user/{user}/upload-image', [AdminController::class, 'uploadImage']);
     Route::post('admin/classroom', [ClassroomController::class, 'createClassroom']);
-    Route::post('admin/classroom/{classroom}/students', [ClassroomController::class, 'addStudents']);
-    Route::put('admin/classroom/{classroom}', [ClassroomController::class, 'updateClassroom']);
+    Route::post('classrooms/{classroom}/students', [ClassroomController::class, 'addStudents']);
+    Route::post('admin/classroom/{classroom}', [ClassroomController::class, 'updateClassroom']);
     Route::delete('admin/classrooms/{classroom}', [ClassroomController::class, 'deleteClassroom']);
     Route::get('/classrooms', [ClassroomController::class, 'index']);
     Route::get('/classrooms/search', [ClassroomController::class, 'searchClassrooms']);
@@ -50,6 +50,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/password/change', [AuthController::class, 'changePassword']);
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     Route::delete('/classrooms/{classroomId}/students/{studentId}', [ClassroomController::class, 'removeStudent']);
+    Route::delete('/classrooms/{classroomId}/students', [ClassroomController::class, 'removeStudents']);
     Route::get('/classrooms/delegates', [ClassroomController::class, 'getClassroomDelegates']);
     Route::get('/hall-of-fame', [HallOfFameController::class, 'getTopStudents']);
     Route::get('/student/tasks/{student}', [TaskController::class, 'getTasksForStudent']);
