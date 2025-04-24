@@ -31,7 +31,7 @@ class AnnouncementController extends Controller
     public function index()
     {
         // Fetch all announcements
-        $announcements = Announcement::all();
+        $announcements = Announcement::orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'Announcements retrieved successfully',
