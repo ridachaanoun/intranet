@@ -72,5 +72,16 @@ class TaskController extends Controller
         $task->assignedStudents()->attach($studentIds);
     }
 
+    //   Get tasks assigned to a specific student.  
+    public function getTasksForStudent(User $student)
+    {
+        $this->authorize('view', $student);
+        $tasks = $student->tasksAssignedTo()->withCount('assignedStudents')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+        ]);
+    }
 
 }
