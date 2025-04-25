@@ -10,9 +10,10 @@ class UserPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function view(User $authUser, User $user)
     {
-        return false;
+        // Allow viewing if the authenticated user is an admin or the same user
+        return $authUser->role === 'admin' || $authUser->id === $user->id;
     }
 
     /**
