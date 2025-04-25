@@ -76,7 +76,7 @@ class TaskController extends Controller
     public function getTasksForStudent(User $student)
     {
         $this->authorize('view', $student);
-        $tasks = $student->tasksAssignedTo()->withCount('assignedStudents')->get();
+        $tasks = $student->tasksAssignedTo()->withCount('assignedStudents')->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'success' => true,
@@ -84,4 +84,14 @@ class TaskController extends Controller
         ]);
     }
 
+    //  Get tasks assigned by a specific teacher.
+    public function getTasksAssignedByTeacher(User $teacher)
+    {
+        $tasks = $teacher->tasksAssignedBy()->withCount('assignedStudents')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+        ]);
+    }
 }
