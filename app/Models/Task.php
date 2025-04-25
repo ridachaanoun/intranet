@@ -25,11 +25,6 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function assignedTo()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     // Relationship with the Classroom
     public function classroom()
     {
