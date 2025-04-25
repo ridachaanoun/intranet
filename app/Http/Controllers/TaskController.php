@@ -2,57 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     use AuthorizesRequests;
 
-    public function assignTask(Request $request,User $user)
+    public function assignTask(Request $request)
     {
-        $this->authorize('teacher',$user);
+        $teacher = Auth::user();
 
+        $this->authorize('teacher', $teacher);
+
+        // Validate the request
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'assigned_to' => 'required|exists:users,id',
+            'classroom_id' => 'required|exists:classrooms,id',
             'due_date' => 'nullable|date',
+            'points' => 'required|integer|min:0',
+            'task_type' => 'required|string|in:Assignment,Quiz,Project,Research,Other',
+            'assignment_type' => 'required|string|in:class,students',
+            'student_ids' => 'required_if:assignment_type,students|array',
+            'student_ids.*' => 'exists:users,id',
         ]);
 
-        $teacher = Auth::user();
+        // Create the task
+        $task = Task::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'assigned_by' => $teacher->id,
+            'classroom_id' => $request->classroom_id,
+            'due_date' => $request->due_date,
+            'status' => 'Pending',
+            'task_type' => $request->task_type,
+            'points' => $request->points,
+            'assignment_type' => $request->assignment_type,
+        ]);
 
-        $task = new Task();
-        $task->title = $request->title;
-        $task->description = $request->description;
-        $task->assigned_by = $teacher->id;
-        $task->assigned_to = $request->assigned_to;
-        $task->due_date = $request->due_date;
-        $task->status = 'Pending';
-        $task->save();
+        // Attach the task to students based on the assignment type
+        if ($request->assignment_type === 'class') {
+            $this->assignTaskToClass($task, $request->classroom_id);
+        } elseif ($request->assignment_type === 'students') {
+            $this->assignTaskToSpecificStudents($task, $request->student_ids);
+        }
 
         return response()->json(['message' => 'Task assigned successfully', 'task' => $task], 201);
     }
 
-    public function getTasksForStudent(User $student)
+    private function assignTaskToClass(Task $task, $classroomId)
     {
-       $tasks = $student->tasksAssignedTo()->get();
+        $classroom = Classroom::findOrFail($classroomId);
 
-        return response()->json([
-            'success' => true,
-            'data' => $tasks,
-        ]);
+        // Fetch all students in the classroom
+        $students = $classroom->students;
+
+        // Attach the task to all students in the classroom
+        $task->assignedStudents()->attach($students->pluck('id'));
     }
-    public function getTasksAssignedByTeacher(User $teacher)
+
+    private function assignTaskToSpecificStudents(Task $task, array $studentIds)
     {
-       $tasks = $teacher->tasksAssignedBy()->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $tasks,
-        ]);
+        // Attach the task to specific students
+        $task->assignedStudents()->attach($studentIds);
     }
+
+
 }
