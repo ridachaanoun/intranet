@@ -97,4 +97,21 @@ class TaskController extends Controller
             'data' => $tasks,
         ]);
     }
+
+    public function getClassroomsWithStudentsAndTasks()
+    {
+        $teacher = Auth::user();
+
+    $this->authorize("teacher",$teacher);
+
+        // Fetch classrooms where the teacher is assigned
+        $classrooms = $teacher->classroomsAsTeacher()
+            ->with(['students.tasksAssignedTo.assignedBy'])
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $classrooms,
+        ]);
+    }
 }

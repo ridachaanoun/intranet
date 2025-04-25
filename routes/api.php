@@ -61,4 +61,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/promotions', [PromotionController::class, 'getAllPromotions']);
     Route::get('/students', [StudentController::class, 'getAllStudents']);
     Route::get('/teachers', [TeacherController::class, 'getAllTeachers']);
+    Route::get('/teacher/classrooms', [TaskController::class, 'getClassroomsWithStudentsAndTasks']);
 });
