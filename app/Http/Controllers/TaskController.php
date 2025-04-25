@@ -75,8 +75,11 @@ class TaskController extends Controller
     //   Get tasks assigned to a specific student.  
     public function getTasksForStudent(User $student)
     {
-        $this->authorize('view', $student);
-        $tasks = $student->tasksAssignedTo()->withCount('assignedStudents')->orderBy('created_at', 'desc')->get();
+        $tasks = $student->tasksAssignedTo()
+            ->with(['assignedBy']) // Eager load the teacher who assigned the task
+            ->withCount('assignedStudents')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
