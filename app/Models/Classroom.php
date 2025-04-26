@@ -33,12 +33,15 @@ class Classroom extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'classroom_student', 'classroom_id', 'student_id')
-                    ->where('role', 'student');
+                    ->where('users.role', 'student')
+                    ->select('users.*');
     }
+
     public function cursusHistories()
     {
         return $this->hasMany(CursusHistory::class, 'class_id');
     }
+
     public function getCoverImageUrlAttribute()
     {
         return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
