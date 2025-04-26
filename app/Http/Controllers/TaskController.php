@@ -49,7 +49,7 @@ class TaskController extends Controller
         if ($request->assignment_type === 'class') {
             $this->assignTaskToClass($task, $request->classroom_id);
         } elseif ($request->assignment_type === 'students') {
-            $this->assignTaskToSpecificStudents($task, $request->student_ids);
+            return $this->assignTaskToSpecificStudents($task, $request->student_ids);
         }
 
         return response()->json(['message' => 'Task assigned successfully', 'task' => $task], 201);
@@ -68,8 +68,30 @@ class TaskController extends Controller
 
     private function assignTaskToSpecificStudents(Task $task, array $studentIds)
     {
-        // Attach the task to specific students
-        $task->assignedStudents()->attach($studentIds);
+        $classroom = Classroom::findOrFail($task->classroom_id);
+
+        $studentsInClassroom = $classroom->students()->pluck('id')->toArray();
+
+        $validStudentIds = array_intersect($studentIds, $studentsInClassroom);
+
+        $invalidStudentIds = array_diff($studentIds, $studentsInClassroom);
+
+        if (empty($validStudentIds)) {
+            // If no valid students are found, return an error with the invalid students
+            return response()->json([
+                'message' => 'No valid students found in the specified classroom.',
+                'invalid_students' => $invalidStudentIds,
+            ], 400);
+        }
+
+        // Attach the task to the valid students
+        $task->assignedStudents()->attach($validStudentIds);
+
+        // Return a success response with the invalid students
+        return response()->json([
+            'message' => 'Task assigned successfully to valid students.',
+            'invalid_students' => $invalidStudentIds,
+        ], 200);
     }
 
     //   Get tasks assigned to a specific student.  
