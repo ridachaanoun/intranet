@@ -91,7 +91,9 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Task assigned successfully to valid students.',
             'invalid_students' => $invalidStudentIds,
+            'task' => $task
         ], 200);
+
     }
 
     //   Get tasks assigned to a specific student.  
@@ -128,8 +130,9 @@ class TaskController extends Controller
 
         // Fetch classrooms where the teacher is assigned
         $classrooms = $teacher->classroomsAsTeacher()
-            ->with(['students.tasksAssignedTo.assignedBy'])
-            ->get();
+        ->with(['students.tasksAssignedTo.assignedBy'])
+        ->orderBy('created_at','desc')
+        ->get();
 
         return response()->json([
             'success' => true,
