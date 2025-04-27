@@ -46,4 +46,8 @@ class Classroom extends Model
     {
         return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
     }
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'classroom_id');
+    }
 }
