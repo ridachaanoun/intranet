@@ -130,13 +130,20 @@ class TaskController extends Controller
 
         // Fetch classrooms where the teacher is assigned
         $classrooms = $teacher->classroomsAsTeacher()
-            ->with(['students', 'tasks.assignedStudents']) // Include students and tasks with assigned students
+            ->with(['students.points', 'tasks']) // Include students with their points and tasks
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Add total points for each student
+        $classrooms->each(function ($classroom) {
+            $classroom->students->each(function ($student) {
+                $student->total_points = $student->points->sum('points'); // Calculate total points for the student
+            });
+        });
+
         return response()->json([
             'success' => true,
-            'message' => 'Classrooms with students and tasks retrieved successfully.',
+            'message' => 'Classrooms with students and their total points retrieved successfully.',
             'data' => $classrooms,
         ]);
     }
