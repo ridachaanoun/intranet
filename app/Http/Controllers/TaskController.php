@@ -126,16 +126,17 @@ class TaskController extends Controller
     {
         $teacher = Auth::user();
 
-    $this->authorize("teacher",$teacher);
+        $this->authorize('teacher', $teacher);
 
         // Fetch classrooms where the teacher is assigned
         $classrooms = $teacher->classroomsAsTeacher()
-        ->with(['students.tasksAssignedTo.assignedBy'])
-        ->orderBy('created_at','desc')
-        ->get();
+            ->with(['students', 'tasks.assignedStudents']) // Include students and tasks with assigned students
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
+            'message' => 'Classrooms with students and tasks retrieved successfully.',
             'data' => $classrooms,
         ]);
     }
