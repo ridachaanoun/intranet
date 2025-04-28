@@ -51,7 +51,7 @@ class TaskController extends Controller
         } elseif ($request->assignment_type === 'students') {
             return $this->assignTaskToSpecificStudents($task, $request->student_ids);
         }
-
+        $task->load('assignedStudents');
         return response()->json(['message' => 'Task assigned successfully', 'task' => $task], 201);
     }
 
@@ -91,7 +91,7 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Task assigned successfully to valid students.',
             'invalid_students' => $invalidStudentIds,
-            'task' => $task
+            'task' => $task->load('assignedStudents'),
         ], 200);
 
     }
@@ -130,7 +130,7 @@ class TaskController extends Controller
 
         // Fetch classrooms where the teacher is assigned
         $classrooms = $teacher->classroomsAsTeacher()
-            ->with(['students.points', 'tasks']) // Include students with their points and tasks
+            ->with(['students.points', 'tasks.assignedStudents']) // Include students with their points and tasks, and assigned students for each task
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -143,7 +143,7 @@ class TaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Classrooms with students and their total points retrieved successfully.',
+            'message' => 'Classrooms with students, their total points, and tasks retrieved successfully.',
             'data' => $classrooms,
         ]);
     }
