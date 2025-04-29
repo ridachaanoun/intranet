@@ -147,4 +147,23 @@ class TaskController extends Controller
             'data' => $classrooms,
         ]);
     }
+    public function updateTaskStatus(Request $request, Task $task)
+    {
+        $this->authorize("teacher",auth()->user());
+        // Validate the request
+        $request->validate([
+            'status' => 'required|string|in:Pending,In Active,Completed,Active,Completed Pending',
+        ]);
+        
+        // Update the task status
+        $task->update([
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task status updated successfully.',
+            'task' => $task,
+        ], 200);
+    }
 }
