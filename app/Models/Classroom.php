@@ -50,4 +50,8 @@ class Classroom extends Model
     {
         return $this->hasMany(Task::class, 'classroom_id');
     }
+    public function absences()
+    {
+        return $this->hasMany(Absence::class,'classroom_id');
+    }
 }
