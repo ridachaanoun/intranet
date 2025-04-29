@@ -14,27 +14,39 @@ use AuthorizesRequests;
 
     public function addAbsence(Request $request)
     {
-        $this->authorize("teacher",User::class);
+        $this->authorize("teacher", User::class);
+
         $request->validate([
             'date' => 'required|date',
             'status' => 'required|string',
             'class' => 'required|string',
             'session' => 'required|string',
             'user_id' => 'required|exists:users,id',
+            'classroom_id' => 'required|exists:classrooms,id',
             'reason' => 'nullable|string',
         ]);
+
+        // Get the authenticated user's ID
+        $confirmedBy = Auth::id();
+
+        if (!$confirmedBy) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
 
         $absence = Absence::create([
             'date' => $request->date,
             'status' => $request->status,
             'class' => $request->class,
             'session' => $request->session,
-            'confirmed_by' => Auth::id(),
+            'confirmed_by' => $confirmedBy,
             'user_id' => $request->user_id,
+            'classroom_id' => $request->classroom_id,
             'reason' => $request->reason,
         ]);
 
-        return response()->json(['message' => 'Absence added successfully', 'absence' => $absence], 201);
+        $absence->load('user');
+
+        return response()->json(['message' => 'Absence added successfully', 'absence' => $absence,"id"=>$confirmedBy], 201);
     }
     public function getAbsenceDetailsByUserId (User $user){
 
