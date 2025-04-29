@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Point extends Model
 {
-    protected $fillable = ['student_id', 'teacher_id', 'points', 'reason'];
+    protected $fillable = ['student_id', 'teacher_id', 'points', 'reason', 'custom_reason', 'note'];
 
     public function student()
     {
