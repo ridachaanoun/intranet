@@ -63,10 +63,13 @@ use AuthorizesRequests;
         return response()->json(['absences' => $absences], 200);
     
     }
-    public function getAbsenceDetailsByClassroomId ($classroomId){
-
-        $absences = Absence::where('classroom_id', $classroomId)->get();
+    public function getAbsenceDetailsByClassroomId($classroomId)
+    {
+        $absences = Absence::where('classroom_id', $classroomId)
+            ->orderBy('created_at', 'desc')
+            ->get();
         $absences->load('user');
+
         if (!$absences) {
             return response()->json(['message' => 'Classroom not found'], 404);
         }
