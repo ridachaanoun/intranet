@@ -63,4 +63,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/teachers', [TeacherController::class, 'getAllTeachers']);
     Route::get('/teacher/classrooms', [TaskController::class, 'getClassroomsWithStudentsAndTasks']);
     Route::put('/tasks/{task}/status', [TaskController::class, 'updateTaskStatus']);
+    Route::get('/classroom/absence/{classroomId}', [AbsenceController::class, 'getAbsenceDetailsByClassroomId']);
 });
