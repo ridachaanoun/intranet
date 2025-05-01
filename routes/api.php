@@ -6,6 +6,7 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HallOfFameController;
 use App\Http\Controllers\Loged_in_user;
 use App\Http\Controllers\PointController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInfoController;
@@ -64,4 +65,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/teacher/classrooms', [TaskController::class, 'getClassroomsWithStudentsAndTasks']);
     Route::put('/tasks/{task}/status', [TaskController::class, 'updateTaskStatus']);
     Route::get('/classroom/absence/{classroomId}', [AbsenceController::class, 'getAbsenceDetailsByClassroomId']);
+    Route::get('/products', [ProductController::class, 'index']);
 });
