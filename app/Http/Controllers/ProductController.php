@@ -61,4 +61,15 @@ class ProductController extends Controller
         $product->update($validated);
         return response()->json($product);
     }
+
+    public function destroy($id)
+    {
+        $this->authorize("admin", User::class);
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'product not found'], 404);
+        }
+        $product->delete();
+        return response()->json(['message'=>'product is deleted'], 204);
+    }
 }
