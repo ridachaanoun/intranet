@@ -21,7 +21,7 @@ class Loged_in_user extends Controller
         ]);
     
         // Calculate total points
-        $totalPoints = $user->points->sum('points');
+        $totalPoints = $user->points->sum('points') - $user->points_used;
     
         $user->Total_points = $totalPoints;
     

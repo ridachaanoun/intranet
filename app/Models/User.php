@@ -86,6 +86,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Classroom::class, 'classroom_student', 'student_id', 'classroom_id');
     }
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'student_product');
+    }
+
     public function getImageUrlAttribute()
     {
         return $this->image ? asset('storage/' . $this->image) : null;

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\User;
+use Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -71,5 +72,28 @@ class ProductController extends Controller
         }
         $product->delete();
         return response()->json(['message'=>'product is deleted'], 204);
+    }
+
+    public function buyProduct($productId)
+    {
+        $user = Auth::user();
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        $totalPoints = $user->points->sum('points')- $user->points_used;
+        // Check if the user has enough points
+        if ($totalPoints < $product->price) {
+            return response()->json(['message' => 'Not enough points'], 400);
+        }
+
+        $user->points_used += $product->price;
+        $user->save();
+
+        // Save purchase history
+        $user->products()->attach($productId);
+
+        return response()->json(['message' => 'Product purchased successfully']);
     }
 }

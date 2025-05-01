@@ -21,4 +21,9 @@ class Product extends Model
     {
         return $this->image ? asset('storage/' . $this->image) : null;
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'student_product');
+    }
 }
