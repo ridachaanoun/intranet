@@ -96,4 +96,23 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product purchased successfully']);
     }
+
+    public function getPurchaseNotifications()
+    {
+        $this->authorize("admin", User::class);
+
+        $purchases = Product::with(['students'])->get();
+
+        // Format the notifications
+        $notifications = [];
+        foreach ($purchases as $product) {
+            foreach ($product->students as $student) {
+                $notifications[] = [
+                    'message' => "Student {$student->name} ({$student->email}) purchased the product '{$product->name}'.",
+                ];
+            }
+        }
+
+        return response()->json(['notifications' => $notifications]);
+    }
 }

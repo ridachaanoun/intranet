@@ -71,4 +71,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
     Route::post('/products/{productId}/buy', [ProductController::class, 'buyProduct']);
+    Route::get('/admin/purchase-notifications', [ProductController::class, 'getPurchaseNotifications']);
 });
