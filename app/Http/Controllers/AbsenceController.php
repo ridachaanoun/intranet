@@ -54,7 +54,7 @@ use AuthorizesRequests;
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $absences = $user->absences;
+        $absences = $user->absences->sortByDesc('created_at');
 
         if ($absences->isEmpty()) {
             return response()->json(['message' => 'No absences found for this user'], 404);
